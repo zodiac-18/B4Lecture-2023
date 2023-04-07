@@ -6,7 +6,7 @@
 
 1. 本リポジトリを自分のアカウントにフォークする
   (右上のForkボタンを押す)
-  
+
 2. フォークした自分のリポジトリに自動的に遷移する。
 
 3. フォークした自分のリポジトリを適当な場所へダウンロードする。(リポジトリページ右上の[↓Code]ボタンからURLをコピー)
@@ -66,7 +66,7 @@
 
 ## プルリク出す時
 
-課題ができたら(一旦結果を出力できたら)先輩にコードレビューを依頼する  
+課題ができたら(一旦結果を出力できたら)先輩にコードレビューを依頼する
 以下の事項に注意しプルリクエストを送信する
 
 - [ ] タイトルは **[名前] EX○ 解答 [matlab or python]** になっている
@@ -78,7 +78,7 @@
 
 ## その他
 
-[演習を進める上でのコツ](./Tips.md)
+[演習を進める上でのコツ](./TIPS.md)
 
 [GitとGithubの理解](https://docs.google.com/a/g.sp.m.is.nagoya-u.ac.jp/viewer?a=v&pid=sites&srcid=Zy5zcC5tLmlzLm5hZ295YS11LmFjLmpwfHNwbG9jYWwtc2VtaXxneDoxZmI4YWVhZWVlNDBjNDY1)
 
