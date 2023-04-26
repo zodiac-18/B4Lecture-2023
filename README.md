@@ -18,8 +18,8 @@
 4. 本家リポジトリを登録 (upstreamという名前でなくてもいい)
 
     ```bash
-    $ cd B4Lecture-2022
-    $ git remote add upstream https://github.com/TakedaLab/B4Lecture-2022.git
+    $ cd B4Lecture-2023
+    $ git remote add upstream https://github.com/TakedaLab/B4Lecture-2023.git
     ```
 
 
@@ -27,7 +27,7 @@
 
 1. masterブランチに戻る
   ```bash
-  $ cd B4Lecture-2022
+  $ cd B4Lecture-2023
   $ git checkout master
   ```
 2. 本家リポジトリから更新されたソースをマージする
@@ -61,7 +61,7 @@
 
 10. レビューを受けてRequest Changesを修正 -> add -> commit -> pushを繰り返す
 
-11. 必須レビュアー（修士学生１人）がApprobeしたら、吉岡がマージする。マージされたら本家リポジトリに自分のコードが反映される。
+11. 必須レビュアー（修士学生１人）がApprobeしたら、米山がマージする。マージされたら本家リポジトリに自分のコードが反映される。
 
 
 ## プルリク出す時
