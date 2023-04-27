@@ -8,14 +8,20 @@ def main():
     wavf = 'ONSEI.wav'
     wr = wave.open(wavf, 'r')
     ch = wr.getnchannels()  # チャンネル数
-    width = wr.getsampwidth()   # サンプルサイズ
+    samplesize = wr.getsampwidth()   # サンプルサイズ
     fr = wr.getframerate()  # サンプリングレート
-    fn = wr.getnframes()    # フレーム数
+    fn = 436000    # データ整形のために指定
     data = wr.readframes(fn)    # fn個のフレームを読んでbytesオブジェクトで返す
-    TOTAL_TIME = 1.0 * fn / fr
     wr.close()
     # 数値に変換
-    num_data = np.frombuffer(data, dtype = 'int16')
+    if samplesize == 2:
+        num_data = np.frombuffer(data, dtype = 'int16')
+    elif samplesize == 4:
+        num_data = np.frombuffer(data, dtype = 'int32')
+    # データを扱いやすく整形
+    num_data = num_data[:fn]/float((2^15))
+    TOTAL_TIME = 1.0 * fn / fr
+
     time = np.linspace(0, TOTAL_TIME, num_data.shape[0])
     sampling_rate = fr
 
@@ -25,10 +31,9 @@ def main():
     print(num_data)
 
     plt.plot(time, num_data)
+    plt.xlabel("time [s]")
+    plt.ylabel("Amplitude")
     plt.show()
-
-    # データを扱いやすく整形
-    num_data = num_data[:436000]/float((2^15))
 
     WIDTH = 1000    # 分割フレームの大きさ
     OVERLAP = int(WIDTH / 2) # フレームのシフト幅
@@ -45,44 +50,45 @@ def main():
 
     # 分割でフーリエ変換したデータのサイズを求める
     fframe_size = np.fft.fft(num_data[pos:pos+WIDTH])
-    fframe_size = fframe_size[:int(len(fframe_size)/2)]
     fframe_size = fframe_size.shape[0]
     # スペクトログラムの配列
-    spec = np.zeros([split_number, fframe_size])
+    spec = np.zeros([split_number, fframe_size], dtype=complex)
     im_result = spec    # 虚部の確保をする配列
 
     # STFT
     for i in range(split_number):
         frame = num_data[pos:pos+WIDTH]
         windowed = window * frame   # 窓関数をかける
-        # フーリエ変換．折り返しをカットして対数をとる
+        # 短時間に分けたものをフーリエ変換
         fft_result = np.fft.fft(windowed)
-        # plt.plot(windowed)
-        # plt.show()
-        # plt.plot(fft_result)
-        # plt.show()
-        f_frame = np.real(fft_result[:int(len(fft_result)/2)])
-        f_frame = np.log(f_frame ** 2)
 
-        spec[i] = f_frame[::-1]
-
+        spec[i] = fft_result
         pos += OVERLAP
     
+    # グラフにプロットするために実数の対数をとる
+    amp = np.real(spec[:,int(spec.shape[1]/2)::-1])
+    amp = np.log(amp** 2)
 
-
-
-    # print(spec)
+    # スペクトログラムの表示
     plt.rcParams['image.cmap'] = 'jet'
-    plt.imshow(spec.T, extent=[0, TOTAL_TIME, 0, sampling_rate/2000], aspect="auto")
+    plt.imshow(amp.T, extent=[0, TOTAL_TIME, 0, sampling_rate/2000], aspect="auto")
     plt.xlabel("time [s]")
     plt.ylabel("frequency [kHz]")
     plt.colorbar()
     plt.show()
 
+    ifft_wave = np.zeros(num_data.shape)
+    pos = 0
+    # iSTFT
+    for i in range(split_number):
+        ifft_result = np.fft.ifft(spec[i])
+        windowed = np.real(ifft_result)
+        ifft_wave[pos:pos+WIDTH] = windowed / window
+        
+        pos += OVERLAP
 
-
-
-
+    plt.plot(time, ifft_wave)
+    plt.show()
 
 
 
