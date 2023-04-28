@@ -3,7 +3,7 @@ name: Check directory name
 on:
   pull_request:
     branches:
-      - main
+      - master
     types:
       - opened
     paths-ignore:
