@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 SOUND_PATH = "voice.wav"                     # path to the sound
-Fs = 1024                                    # frame size
-overlap_r = 0.7                              # overlap rate between 0 to 1
+Fs = 512                                    # frame size
+overlap_r = 0.9                              # overlap rate between 0 to 1
 
 
 # load sound file
@@ -62,22 +62,24 @@ a = np.delete(frame_group2, slice(int(Fs/2)-1,Fs),1)                            
 a = a.T
 
 # create graph's group
-fig = plt.figure(figsize = (10,12))
+fig, axs = plt.subplots(3, 1, figsize=(10, 12))
 
 # create subplot domain
-base_sound = fig.add_subplot(3,1,1)
-sound_spec = fig.add_subplot(3,1,2)
-repro_sound = fig.add_subplot(3,1,3)
+base_sound = axs[0]
+sound_spec = axs[1]
+repro_sound = axs[2]
 fig.subplots_adjust(hspace=0.5)
-sound_spec
+
 #set x limit
 base_sound.set_xlim(0,len(data)/samplerate)
 repro_sound.set_xlim(0,len(data)/samplerate)
 
 # plot data
 base_sound.plot(x_t, data)
-a = sound_spec.pcolormesh(spec_t, freq[1:int(Fs/2)], 10*np.log(np.abs(a)), shading='nearest')
-b = plt.colorbar(a,ax=sound_spec)
+cax = fig.add_axes([0.92, 0.395, 0.02, 0.2]) # x, y, width, height
+a = sound_spec.pcolormesh(spec_t, freq[1:int(Fs/2)], 10*np.log(np.abs(a)), cmap='plasma', shading='nearest')
+cb = fig.colorbar(a, cax=cax)
+cb.set_label('Amplitude[dB]',labelpad=-0.1)
 repro_sound.plot(x_t, origin_sound)
 
 # set x label
