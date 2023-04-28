@@ -7,14 +7,14 @@ Fs = 512                                    # frame size
 overlap_r = 0.9                              # overlap rate between 0 to 1
 
 
-# load sound file
 def load_sound(sound_path):
+    """load sound file"""
     data, samplerate = sf.read(file=sound_path)
     return data, samplerate
 
 
-# short-time fourier transform
 def stft(data, overlap, Fs, samplerate):
+    """short-time fourier transform"""
     frame_dist = int(Fs * (1 - overlap))                   # distance between segment and segment
     frame_group = []                                       # list to collect frame
     win = np.hamming(Fs)                                   # create windows
@@ -32,8 +32,8 @@ def stft(data, overlap, Fs, samplerate):
     return frame_group, freq, frame_s
 
 
-# inverse stft
 def istft(data, overlap, length):
+    """inverse stft"""
     # create a list to generate sound data
     origin_sound = np.zeros(length)
     seg_s = 0
@@ -73,8 +73,9 @@ repro_sound.set_xlim(0, len(data) / samplerate)
 # plot data
 base_sound.plot(x_t, data)
 cax = fig.add_axes([0.92, 0.395, 0.02, 0.2])    # x, y, width, height
-spec_d = sound_spec.pcolormesh(spec_t, freq[1:int(Fs / 2)], 
-                               10 * np.log(np.abs(frame_positive)), cmap='plasma', shading='nearest')
+spec_d = sound_spec.pcolormesh(spec_t, freq[1:int(Fs / 2)],
+                               10 * np.log(np.abs(frame_positive)),
+                               cmap='plasma', shading='nearest')
 color_b = fig.colorbar(spec_d, cax=cax)
 color_b.set_label('Amplitude[dB]', labelpad=-0.1)
 repro_sound.plot(x_t, origin_sound)
