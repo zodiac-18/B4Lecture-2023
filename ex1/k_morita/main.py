@@ -9,7 +9,6 @@ import spectrogram as sp
 
 
 if __name__ == "__main__":
-
     soundfile = sys.argv[1]
     samplerate = 16000
     window_length = 512
@@ -19,14 +18,14 @@ if __name__ == "__main__":
     y, samplerate = librosa.load(soundfile, sr=samplerate)
     nyquist_freq = samplerate // 2
 
-    # stft 
+    # stft
     fft_array, total_time, total_frame = sp.stft(
         y, sr=samplerate, win_len=window_length, ol=overlap_rate
     )
     mag, _ = sp.magphase(fft_array)
     mag_db = sp.mag_to_db(mag)
 
-    # istft 
+    # istft
     y_inv, _, _ = sp.istft(
         fft_array, sr=samplerate, win_len=window_length, ol=overlap_rate
     )

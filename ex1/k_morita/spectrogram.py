@@ -9,22 +9,20 @@ def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.5):
     total_frame = hop_len * n_steps + win_len
     total_time = total_frame / sr
 
-
     fft_array = [
         np.fft.fft(window * y[i * hop_len : i * hop_len + win_len])
         for i in range(n_steps)
     ]
     fft_array = np.array(fft_array).T
-    fft_array = fft_array[fft_array.shape[0]//2:]
+    fft_array = fft_array[fft_array.shape[0] // 2 :]
 
     return fft_array, total_time, total_frame
 
 
 def istft(fft_array, sr, win_func=np.hamming, win_len=2048, ol=0.75):
-
     # stftで半分捨てたので、その復元
     if win_len & 1:
-        fft_array = np.concatenate([fft_array, fft_array[::-1, :][:-1]]) 
+        fft_array = np.concatenate([fft_array, fft_array[::-1, :][:-1]])
     else:
         fft_array = np.concatenate([fft_array, fft_array[::-1, :][:]])
 
