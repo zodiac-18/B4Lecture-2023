@@ -58,8 +58,8 @@ origin_sound = istft(frame_group2, overlap_r, data.shape[0])
 x_t = np.arange(0,len(data))/samplerate
 spec_t = np.arange(start=0, stop=frame_l, step=int(Fs*(1-overlap_r)))/samplerate
 
-a = np.delete(frame_group2, slice(int(Fs/2)-1,Fs),1)                                           #cut negative data
-a = a.T
+frame_positive = np.delete(frame_group2, slice(int(Fs/2)-1,Fs),1)                                           #cut negative data
+frame_positive = frame_positive.T
 
 # create graph's group
 fig, axs = plt.subplots(3, 1, figsize=(10, 12))
@@ -77,9 +77,9 @@ repro_sound.set_xlim(0,len(data)/samplerate)
 # plot data
 base_sound.plot(x_t, data)
 cax = fig.add_axes([0.92, 0.395, 0.02, 0.2]) # x, y, width, height
-a = sound_spec.pcolormesh(spec_t, freq[1:int(Fs/2)], 10*np.log(np.abs(a)), cmap='plasma', shading='nearest')
-cb = fig.colorbar(a, cax=cax)
-cb.set_label('Amplitude[dB]',labelpad=-0.1)
+spec_d = sound_spec.pcolormesh(spec_t, freq[1:int(Fs/2)], 10*np.log(np.abs(frame_positive)), cmap='plasma', shading='nearest')
+color_b = fig.colorbar(spec_d, cax=cax)
+color_b.set_label('Amplitude[dB]',labelpad=-0.1)
 repro_sound.plot(x_t, origin_sound)
 
 # set x label
