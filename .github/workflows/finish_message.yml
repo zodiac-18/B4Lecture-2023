@@ -3,7 +3,7 @@ name: Well done message
 on:
   pull_request:
     branches:
-      - main
+      - master
     types:
       - closed
 
