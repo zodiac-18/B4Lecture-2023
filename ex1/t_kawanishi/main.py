@@ -9,13 +9,13 @@ overlap_r = 0.9                              # overlap rate between 0 to 1
 
 # load sound file
 def load_sound(sound_path):
-    data, samplerate = sf.read(file= sound_path)
+    data, samplerate=sf.read(file= sound_path)
     return data, samplerate
 
 
 # short-time fourier transform
 def stft(data, overlap, Fs, samplerate):
-    frame_dist = int(Fs * (1 - overlap))                       # distance between segment and segment
+    frame_dist = int(Fs * (1 - overlap))                   # distance between segment and segment
     frame_group = []                                       # list to collect frame
     win = np.hamming(Fs)                                   # create windows
 
@@ -23,14 +23,13 @@ def stft(data, overlap, Fs, samplerate):
     frame_s = 0
     while True:
         if frame_s + Fs > data.shape[0]:
-            break 
+            break
         frame = np.fft.fft(data[frame_s:frame_s + Fs] * win)
         frame_group.append(frame)
         frame_s += frame_dist
-    freq = np.fft.fftfreq(Fs, d = 1 / samplerate)
-    freq = freq / 1000
-    frame_l = frame_s                                       # last frame's location
-    return frame_group, freq, frame_l
+    freq=np.fft.fftfreq(Fs, d=1 / samplerate)
+    freq=freq / 1000
+    return frame_group, freq, frame_s
 
 
 # inverse stft
