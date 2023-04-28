@@ -1,6 +1,4 @@
-"""
-To generate spectrogram.
-"""
+"""To generate spectrogram."""
 import soundfile as sf
 import matplotlib.pyplot as plt
 import numpy as np
