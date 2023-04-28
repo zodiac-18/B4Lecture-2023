@@ -1,3 +1,6 @@
+"""
+To generate spectrogram.
+"""
 import soundfile as sf
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,13 +11,13 @@ overlap_r = 0.9                              # overlap rate between 0 to 1
 
 
 def load_sound(sound_path):
-    """load sound file"""
+    """Load sound file."""
     data, samplerate = sf.read(file=sound_path)
     return data, samplerate
 
 
 def stft(data, overlap, Fs, samplerate):
-    """short-time fourier transform"""
+    """Short-time fourier transform."""
     frame_dist = int(Fs * (1 - overlap))                   # distance between segment and segment
     frame_group = []                                       # list to collect frame
     win = np.hamming(Fs)                                   # create windows
@@ -33,7 +36,7 @@ def stft(data, overlap, Fs, samplerate):
 
 
 def istft(data, overlap, length):
-    """inverse stft"""
+    """Inverse stft."""
     # create a list to generate sound data
     origin_sound = np.zeros(length)
     seg_s = 0
