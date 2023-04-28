@@ -1,12 +1,11 @@
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
+
 import librosa
+import matplotlib.pyplot as plt
+import numpy as np
 import soundfile as sf
 
-# original module
 import spectrogram as sp
-
 
 if __name__ == "__main__":
     soundfile = sys.argv[1]

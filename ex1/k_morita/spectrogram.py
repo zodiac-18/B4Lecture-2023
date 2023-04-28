@@ -1,5 +1,4 @@
 import numpy as np
-import soundfile as sf
 
 
 def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.5):
