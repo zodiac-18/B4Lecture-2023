@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.75) -> tuple(np.ndarray, float, int):
+def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.75):
     """Short-time Fourier Transform
 
     Args:
