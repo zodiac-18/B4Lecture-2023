@@ -2,7 +2,7 @@ import numpy as np
 
 
 def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.75):
-    """Short-time Fourier Transform
+    """Short-time Fourier Transform.
 
     Args:
         y (np.ndarray): input signal
@@ -38,7 +38,7 @@ def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.75):
 
 
 def istft(fft_array, sr, win_func=np.hamming, win_len=2048, ol=0.75):
-    """Inverse SHort-time Fourier Transform
+    """Inverse SHort-time Fourier Transform.
 
     Args:
         fft_array (np.ndarray): stft matrix
@@ -84,7 +84,7 @@ def istft(fft_array, sr, win_func=np.hamming, win_len=2048, ol=0.75):
 
 
 def magphase(complex):
-    """calculate magnitude and phase from complex-valued stft matrix
+    """calculate magnitude and phase from complex-valued stft matrix.
 
     Args:
         complex (np.ndarray): complex-valued stft matrix
@@ -100,7 +100,7 @@ def magphase(complex):
 
 
 def mag_to_db(mag):
-    """convert an mag spectrogram into dB-scaled spectrogram
+    """convert an mag spectrogram into dB-scaled spectrogram.
 
     Args:
         mag (np.ndarray): magnitude
