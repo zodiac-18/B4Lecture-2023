@@ -28,7 +28,7 @@ dist_of_Frame = F_size - OverRap  # フレーム間の距離
 win = sp.hann(F_size)  # 窓関数としてハニング窓を使用(他にハミング窓、ブラックマン窓などが存在)
 fft_start = 0  # フレームの開始位置
 while fft_start + F_size <= N:  # 次のフレーム幅の末端がサンプル数を超えるまでfft
-    Frame = sample_data[fft_start: fft_start + F_size]  # 音源データからフレームを切り出す
+    Frame = sample_data[fft_start : fft_start + F_size]  # 音源データからフレームを切り出す
     fft_per = np.fft.fft(win * Frame)  # fftを実行
     fft.append(fft_per)  # 結果を格納
     fft_start += dist_of_Frame
@@ -56,7 +56,7 @@ ifft = np.zeros(N)  # 逆変換の結果格納
 start_ifft = 0  # 逆変換した波形を格納するスタート位置
 for fft_per in fft_for_irfft:
     ifft_per = np.fft.ifft(fft_per)  # 逆変換
-    ifft[start_ifft: start_ifft + F_size] += np.real(ifft_per)  # 逆変換結果を格納
+    ifft[start_ifft : start_ifft + F_size] += np.real(ifft_per)  # 逆変換結果を格納
     start_ifft += dist_of_Frame
 
 # 逆変換の結果の波形を表示
