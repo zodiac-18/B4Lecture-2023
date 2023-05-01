@@ -1,7 +1,22 @@
 import numpy as np
 
 
-def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.5):
+def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.75) -> tuple(np.ndarray, float, int):
+    """Short-time Fourier Transform
+
+    Args:
+        y (np.ndarray): input signal
+        sr (int): sampling rate
+        win_func (function, optional): window function. Defaults to np.hamming.
+        win_len (int, optional): window length. Defaults to 2048.
+        ol (float, optional): overlap rate. Defaults to 0.5.
+
+    Returns:
+        tuple(np.ndarray, float, int):
+            fft_array(np.ndarray): complex-valued stft matrix
+            total_time(float): total signal time [s]
+            total_frame(int): total signal frame
+    """
     window = win_func(win_len)  # create window
     hop_len = int(win_len * (1 - ol))  # length of a hop
     n_steps = (len(y) - win_len) // hop_len  # number of fft steps
@@ -23,6 +38,21 @@ def stft(y, sr, win_func=np.hamming, win_len=2048, ol=0.5):
 
 
 def istft(fft_array, sr, win_func=np.hamming, win_len=2048, ol=0.75):
+    """Inverse SHort-time Fourier Transform
+
+    Args:
+        fft_array (np.ndarray): stft matrix
+        sr (int): sampling rate
+        win_func (function, optional): window function. Defaults to np.hamming.
+        win_len (int, optional): window length. Defaults to 2048.
+        ol (float, optional): overlap rate. Defaults to 0.75.
+
+    Returns:
+        tuple(np.ndarray, float, int):
+            data(np.ndarray): complex-valued matrix reconstructed from stft
+            total_time(float): total signal time [s]
+            total_frame(int): total signal frame
+    """
     # recover fft_array
     if win_len & 1:  # if window length is odd
         fft_array = np.concatenate([fft_array, fft_array[::-1, :][:-1]])
@@ -54,11 +84,29 @@ def istft(fft_array, sr, win_func=np.hamming, win_len=2048, ol=0.75):
 
 
 def magphase(complex):
+    """calculate magnitude and phase from complex-valued stft matrix
+
+    Args:
+        complex (np.ndarray): complex-valued stft matrix
+
+    Returns:
+        tuple (np.ndarray, np.ndarray):
+            mag (np.ndarray): magnitude
+            phase (np.ndarray): phase
+    """
     mag = np.abs(complex)
     phase = np.exp(1.0j * np.angle(complex))
     return mag, phase
 
 
 def mag_to_db(mag):
+    """convert an mag spectrogram into dB-scaled spectrogram
+
+    Args:
+        mag (np.ndarray): magnitude
+
+    Returns:
+        db (np.ndarray): dB-scaled magnitude
+    """
     db = 20 * np.log10(mag)
     return db
