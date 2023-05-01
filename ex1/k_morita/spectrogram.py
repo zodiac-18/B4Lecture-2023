@@ -1,3 +1,4 @@
+"""Spectral processing modules"""
 import numpy as np
 
 
