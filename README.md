@@ -92,3 +92,8 @@
 
 [講義ビデオ](https://drive.google.com/drive/folders/1aOAgjTjUutiw3qwPwpRKhxDrnY0n5XEX?usp=sharing)
 
+---
+
+## 進行係向けマニュアル
+
+[Github Actionsについて](docs/actions_manual.md)
