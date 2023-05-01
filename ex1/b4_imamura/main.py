@@ -5,7 +5,6 @@ import numpy as np
 import scipy.signal as sp
 import soundfile
 
-
 # 音源の読み込み
 sample_path = "sample.wav"  # 音源へのパスを指定
 sample_data, sample_rate = soundfile.read(sample_path)  # 音源データを取得(numpy型)
