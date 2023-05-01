@@ -32,11 +32,17 @@
 
 1. 割り当てを決定しusers.csvに書き込む（手動）
 
+各課題を発表するあたりで実行する．
+
 Actions > Assign PR Reviewers > Run workflow から実行する．
 
 ![assign_workflow](./figs/assign_reviewers_workflow.png)
 
 これによりPRが作成される．users.csvの新たな列に次の課題のレビュアー割り当てが追加される．問題なければマージする．
+
+2. PRに対してレビュアーを設定する（自動）
+
+1でマージすることで，その後作成されたPRに対してusers.csvの情報に基づいてレビュアーが指名される．どの課題かはラベルから判断される．
 
 ### users.csvの書き方
 以下のように4列で書く．**最後は空行にすること．**
@@ -54,10 +60,6 @@ github_account,position,group,laboratory
 <accountX>,m2,reviewer,takeda-lab
 （空白）
 ```
-
-2. PRに対してレビュアーを設定する（自動）
-
-1でマージすることで，その後作成されたPRに対してusers.csvの情報に基づいてレビュアーが指名される．どの課題かはラベルから判断される．
 
 ## コーディングチェック
 デフォルトではCIチェックを通らずともマージが可能である．これはGithubのリポジトリ設定から変更できる．
