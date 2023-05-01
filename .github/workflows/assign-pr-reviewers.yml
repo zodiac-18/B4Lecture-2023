@@ -53,6 +53,12 @@ jobs:
           branch-suffix: "timestamp"
           delete-branch: true
           commit-message: "update users.csv"
+          labels: |
+            assignment
+            auto-pr
+          reviewers: |
+            chomeyama
+            tkmyamamoto
           body: |
             users.csv を更新しました。
             
