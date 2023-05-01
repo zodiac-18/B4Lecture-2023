@@ -8,7 +8,7 @@ import soundfile as sf
 import spectrogram as sp
 
 if __name__ == "__main__":
-    """ main """
+    """main"""
     soundfile = sys.argv[1]
     samplerate = 16000
     window_length = 512
