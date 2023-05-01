@@ -1,4 +1,4 @@
-"""Spectral processing modules"""
+"""Spectral processing modules."""
 import numpy as np
 
 
