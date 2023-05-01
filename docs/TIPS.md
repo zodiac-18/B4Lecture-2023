@@ -41,6 +41,27 @@ PR作成時やその作業ブランチへpushすると，自動でCIが実行さ
 
 上記の注意点などを指摘してくれるので，出力メッセージを参考に美しく読みやすいコーディングを心がけましょう！
 
+チェックでは以下のものが使用されています．
+
+- Linter: black
+- Formatter: flake8
+- import関連: isort
+
+例えば，以下のように実行の様子が確認できます．
+![pr_sample](./figs/pr_sample.png)
+
+引っかかったチェックのDetailsをクリックすると，詳細な情報を見ることができます．
+以下の例だと，docstringを書き忘れていることがわかります．
+![ci_sample](./figs/ci_sample.png)
+
+### コーディングの修正
+以上のチェックエラーを解消する方法の1つを示しておくので，参考にしてください．
+
+1. pipでlinterなどをインストール　`pip install black flake8 flake8-docstrings isort`
+2. それぞれ実行する　`black .`など
+3. コードを修正してエラーを解消する
+4. pushする
+
 <details><summary>コードの書き方の例</summary><div>
 
 ```python:sample.py
