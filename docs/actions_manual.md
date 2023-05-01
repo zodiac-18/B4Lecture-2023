@@ -23,9 +23,18 @@
 ```
 
 ## ラベル
-どのディレクトリに対してpushしているかによって異なるラベルを付与される．
+どのディレクトリに対してpushしているかによって異なるラベルを付与される．レビュアー割り当てで利用される．
 
-レビュアー割り当てで利用される．
+ラベルをまとめて作成するスクリプトは以下の通りである．
+```bash:create_label.sh
+label_name=("EX1" "EX2" "EX3" "EX4" "EX5" "EX6" "EX7" "EX8" "EX9" "assignment" "auto-pr")
+color=("3366CC" "DC3912" "FFA500" "109618" "990099" "AFEEEE" "DD4477" "BCBD22" "B82E2E" "316395" "f2cf01")
+
+for idx in ${!label_name[@]}
+do
+    gh label create ${label_name[idx]} --color ${color[idx]} -R TakedaLab/B4Lecture-XXXX
+done
+```
 
 ## レビュアー割り当て
 割り当てのステップは2段階ある．
