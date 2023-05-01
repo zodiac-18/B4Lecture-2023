@@ -1,3 +1,5 @@
+"""音声の短時間フーリエ変換・逆変換を実装."""
+
 import copy
 
 import matplotlib.pylab as plt
