@@ -35,6 +35,10 @@
 
     例．Atomの場合（参考: [atomでpythonのlinterを利用する](https://qiita.com/fiftystorm36/items/f8ad30ea5eb92c36a6ed)）
 
+## Github ActionsのCIによるコーディングチェック
+
+PR作成時やその作業ブランチへpushすると，自動でCIが実行されます．
+上記の注意点などを指摘してくれるので，出力メッセージを参考に美しく読みやすいコーディングを心がけましょう！
 
 # 演習で困ったら
 
