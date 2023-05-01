@@ -80,6 +80,8 @@
 
 [演習を進める上でのコツ](docs/TIPS.md)
 
+[VSCodeを使いこなそう](docs/vscode.md)
+
 [GitとGithubの理解](https://docs.google.com/a/g.sp.m.is.nagoya-u.ac.jp/viewer?a=v&pid=sites&srcid=Zy5zcC5tLmlzLm5hZ295YS11LmFjLmpwfHNwbG9jYWwtc2VtaXxneDoxZmI4YWVhZWVlNDBjNDY1)
 
 [スライドの作り方](https://www.slideshare.net/ShinnosukeTakamichi/ss-48987441)
