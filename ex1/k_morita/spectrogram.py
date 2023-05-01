@@ -84,7 +84,7 @@ def istft(fft_array, sr, win_func=np.hamming, win_len=2048, ol=0.75):
 
 
 def magphase(complex):
-    """calculate magnitude and phase from complex-valued stft matrix.
+    """Calculate magnitude and phase from complex-valued stft matrix.
 
     Args:
         complex (np.ndarray): complex-valued stft matrix
@@ -100,7 +100,7 @@ def magphase(complex):
 
 
 def mag_to_db(mag):
-    """convert an mag spectrogram into dB-scaled spectrogram.
+    """Convert an mag spectrogram into dB-scaled spectrogram.
 
     Args:
         mag (np.ndarray): magnitude
