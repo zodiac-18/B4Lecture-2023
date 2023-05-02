@@ -1,8 +1,9 @@
 """To generate spectrogram."""
-import soundfile as sf
+import argparse
+
 import matplotlib.pyplot as plt
 import numpy as np
-import argparse
+import soundfile as sf
 
 parser = argparse.ArgumentParser(
     description="This is a program to generate sound's spectrogram"
