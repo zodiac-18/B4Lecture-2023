@@ -46,20 +46,25 @@ def main():
         spec[i] = fft_result
         pos += OVERLAP
     
-    # グラフにプロットするために絶対値の対数をとる
+    # グラフにプロットするために絶対値パワーの対数をとる
     amp = np.abs(spec[:,int(spec.shape[1]/2)::-1])
     amp = np.log(amp** 2)
 
     ifft_wave = np.zeros(data.shape)
+    w_sum = np.zeros(data.shape)
     pos = 0
+    
     # iSTFT
     for i in range(split_number):
-        ifft_result = np.fft.ifft(spec[i])
-        windowed = np.real(ifft_result)
-        ifft_wave[pos:pos+WIDTH] += windowed / window
+        ifft_result = np.fft.ifft(spec[i]) * window
+        ifft_wave[pos:pos+WIDTH] += np.real(ifft_result)
+        w_sum[pos:pos+WIDTH] += window**2
         
         pos += OVERLAP
+    ifft_wave /= np.where(w_sum > 1e-10, w_sum, 1.0)
 
+    # 元信号と復元信号の誤差を表示
+    print(np.mean((data-ifft_wave)**2))
     
     # 時間信号，スペクトログラム，逆変換後をグラフにプロット
     fig = plt.figure(figsize=(6,6))
