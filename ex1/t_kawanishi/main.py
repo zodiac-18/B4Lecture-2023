@@ -85,9 +85,11 @@ def istft(data: np.ndarray, overlap: float, length: int) -> np.ndarray:
     origin_sound = np.zeros(length)
     seg_s = 0
     Fs = len(data[0])
+    size = int(Fs * (1-overlap))
+    win = np.hamming(Fs)  # create windows
     # using ifft to inverse segment
     for i in range(len(data)):
-        origin_sound[seg_s : seg_s + Fs] += np.real(np.fft.ifft(data[i]))
+        origin_sound[seg_s : seg_s + size] += (np.real(np.fft.ifft(data[i])) / win)[0:size]
         seg_s += int(Fs * (1 - overlap))
     return origin_sound
 
@@ -97,7 +99,7 @@ if __name__ == "__main__":
     Fs = args.f_size
     overlap_r = args.overlap_r
     spec_y_lim = args.y_limit
-    data, sample_rate = load_sound(args.path)  # arg1 is sound path
+    data, sample_rate = load_sound(args.path)
     frame_group, freq, frame_l = stft(data, overlap_r, Fs, sample_rate)
     origin_sound = istft(frame_group, overlap_r, data.shape[0])
 
@@ -152,7 +154,7 @@ if __name__ == "__main__":
 
     # set y label
     base_sound.set_ylabel("Sound pressure[Pa]")
-    sound_spec.set_ylabel("Frequency[kHz]")
+    sound_spec.set_ylabel("Frequency[Hz]")
     repro_sound.set_ylabel("Sound pressure[Pa]")
 
     # set title
@@ -162,3 +164,4 @@ if __name__ == "__main__":
 
     plt.show()
     fig.savefig("comparison_graph_ex1.png")
+    sf.write(file='Re_voice.wav', data=origin_sound, samplerate=sample_rate)
