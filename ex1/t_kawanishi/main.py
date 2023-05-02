@@ -85,11 +85,13 @@ def istft(data: np.ndarray, overlap: float, length: int) -> np.ndarray:
     origin_sound = np.zeros(length)
     seg_s = 0
     Fs = len(data[0])
-    size = int(Fs * (1-overlap))
+    size = int(Fs * (1 - overlap))
     win = np.hamming(Fs)  # create windows
     # using ifft to inverse segment
     for i in range(len(data)):
-        origin_sound[seg_s : seg_s + size] += (np.real(np.fft.ifft(data[i])) / win)[0:size]
+        origin_sound[seg_s : seg_s + size] += (np.real(np.fft.ifft(data[i])) / win)[
+            0:size
+        ]
         seg_s += int(Fs * (1 - overlap))
     return origin_sound
 
@@ -164,4 +166,4 @@ if __name__ == "__main__":
 
     plt.show()
     fig.savefig("comparison_graph_ex1.png")
-    sf.write(file='Re_voice.wav', data=origin_sound, samplerate=sample_rate)
+    sf.write(file="Re_voice.wav", data=origin_sound, samplerate=sample_rate)
