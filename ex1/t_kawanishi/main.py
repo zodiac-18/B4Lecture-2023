@@ -39,7 +39,7 @@ def load_sound(sound_path: str) -> tuple[np.ndarray, int]:
 def stft(
     data: np.ndarray, overlap: float, Fs: int, sample_rate: int
 ) -> tuple[np.ndarray, np.ndarray, int]:
-    """short-time fourier transform
+    """short-time fourier transform.
 
     Args:
         data (np.ndarray): sound's signal value
@@ -48,7 +48,8 @@ def stft(
         sample_rate (int): sample rate
 
     Returns:
-        tuple[np.ndarray, np.ndarray, int]: first one is the group of the outcome of data adapted by short-time fourier transform.
+        tuple[np.ndarray, np.ndarray, int]: first one is the group of the outcome of data
+                                            adapted by short-time fourier transform.
                                             second one is each data's corresponding frequency.
                                             last one is last frame's start point
     """
@@ -69,7 +70,7 @@ def stft(
 
 
 def istft(data: np.ndarray, overlap: float, length: int) -> np.ndarray:
-    """Inverse short-time fourier transform
+    """Inverse short-time fourier transform.
 
     Args:
         data (np.ndarray): spectrogram's data matrix
