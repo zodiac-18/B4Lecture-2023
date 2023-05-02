@@ -14,13 +14,13 @@ def main():
     # wavファイルの読み込み
     path = 'ONSEI.wav'
     data, samplerate = wavload(path)
-    fn = 436000    # データ整形のために指定
+    fn = 436224   # データ整形のために指定
 
     # データを扱いやすく整形
     data = data[:fn]
     time = np.arange(0, len(data))/samplerate
     TOTAL_TIME = len(data)/samplerate
-    WIDTH = 1000    # 分割フレームの大きさ
+    WIDTH = 2**10    # 分割フレームの大きさ
     OVERLAP = int(WIDTH / 2) # フレームのシフト幅
 
     wave_length = data.shape[0]    # 音声の全フレーム数
@@ -46,8 +46,8 @@ def main():
         spec[i] = fft_result
         pos += OVERLAP
     
-    # グラフにプロットするために実数の対数をとる
-    amp = np.real(spec[:,int(spec.shape[1]/2)::-1])
+    # グラフにプロットするために絶対値の対数をとる
+    amp = np.abs(spec[:,int(spec.shape[1]/2)::-1])
     amp = np.log(amp** 2)
 
     ifft_wave = np.zeros(data.shape)
@@ -56,7 +56,7 @@ def main():
     for i in range(split_number):
         ifft_result = np.fft.ifft(spec[i])
         windowed = np.real(ifft_result)
-        ifft_wave[pos:pos+WIDTH] = windowed / window
+        ifft_wave[pos:pos+WIDTH] += windowed / window
         
         pos += OVERLAP
 
