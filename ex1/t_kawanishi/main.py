@@ -2,11 +2,13 @@
 import soundfile as sf
 import matplotlib.pyplot as plt
 import numpy as np
+import argparse
 
-SOUND_PATH = "voice.wav"                     # path to the sound
 Fs = 512                                    # frame size
 overlap_r = 0.9                              # overlap rate between 0 to 1
-
+spec_ylim = 20000                            # set limit of frequency
+parser = argparse.ArgumentParser(description='This is a program to generate sound\'s spectrogram')
+parser.add_argument('arg1',help='the path of sound')
 
 def load_sound(sound_path):
     """Load sound file."""
@@ -29,7 +31,6 @@ def stft(data, overlap, Fs, samplerate):
         frame_group.append(frame)
         frame_s += frame_dist
     freq = np.fft.fftfreq(Fs, d=1 / samplerate)
-    freq = freq / 1000
     return frame_group, freq, frame_s
 
 
@@ -46,55 +47,60 @@ def istft(data, overlap, length):
     return origin_sound
 
 
-data, samplerate = load_sound(SOUND_PATH)
+if __name__ == '__main__':
 
-frame_group2, freq, frame_l = stft(data, overlap_r, Fs, samplerate)
-origin_sound = istft(frame_group2, overlap_r, data.shape[0])
+    args = parser.parse_args()
+    data, samplerate = load_sound(args.arg1)
+    frame_group2, freq, frame_l = stft(data, overlap_r, Fs, samplerate)
+    origin_sound = istft(frame_group2, overlap_r, data.shape[0])
 
-# compute time
-x_t = np.arange(0, len(data)) / samplerate
-spec_t = np.arange(start=0, stop=frame_l, step=int(Fs * (1 - overlap_r))) / samplerate
+    # compute time
+    x_t = np.arange(0, len(data)) / samplerate
+    spec_t = np.arange(start=0, stop=frame_l, step=int(Fs * (1 - overlap_r))) / samplerate
 
-frame_positive = np.delete(frame_group2, slice(int(Fs / 2) - 1, Fs), 1)         # cut negative data
-frame_positive = frame_positive.T
+    frame_positive = np.delete(frame_group2, slice(int(Fs / 2) - 1, Fs), 1)         # cut negative data
+    frame_positive = frame_positive.T
 
-# create graph's group
-fig, axs = plt.subplots(3, 1, figsize=(10, 12))
+    # create graph's group
+    fig, axs = plt.subplots(3, 1, figsize=(10, 12))
 
-# create subplot domain
-base_sound = axs[0]
-sound_spec = axs[1]
-repro_sound = axs[2]
-fig.subplots_adjust(hspace=0.5)
+    # create subplot domain
+    base_sound = axs[0]
+    sound_spec = axs[1]
+    repro_sound = axs[2]
+    fig.subplots_adjust(hspace=0.5)
 
-# set x limit
-base_sound.set_xlim(0, len(data) / samplerate)
-repro_sound.set_xlim(0, len(data) / samplerate)
+    # set x limit
+    base_sound.set_xlim(0, len(data) / samplerate)
+    repro_sound.set_xlim(0, len(data) / samplerate)
 
-# plot data
-base_sound.plot(x_t, data)
-cax = fig.add_axes([0.92, 0.395, 0.02, 0.2])    # x, y, width, height
-spec_d = sound_spec.pcolormesh(spec_t, freq[1:int(Fs / 2)],
-                               10 * np.log(np.abs(frame_positive)),
-                               cmap='plasma', shading='nearest')
-color_b = fig.colorbar(spec_d, cax=cax)
-color_b.set_label('Amplitude[dB]', labelpad=-0.1)
-repro_sound.plot(x_t, origin_sound)
+    # set y limit
+    sound_spec.set_ylim(0,spec_ylim)
 
-# set x label
-base_sound.set_xlabel('Time[s]')
-sound_spec.set_xlabel('Time[s]')
-repro_sound.set_xlabel('Time[s]')
+    # plot data
+    base_sound.plot(x_t, data)
+    cax = fig.add_axes([0.92, 0.395, 0.02, 0.2])    # x, y, width, height
+    spec_d = sound_spec.pcolormesh(spec_t, freq[1:int(Fs / 2)],
+                                10 * np.log(np.abs(frame_positive)),
+                                cmap='plasma', shading='nearest')
+    color_b = fig.colorbar(spec_d, cax=cax)
+    color_b.set_label('Amplitude[dB]', labelpad=-0.1)
+    repro_sound.plot(x_t, origin_sound)
 
-# set y label
-base_sound.set_ylabel('Sound pressure[Pa]')
-sound_spec.set_ylabel('Frequency[kHz]')
-repro_sound.set_ylabel('Sound pressure[Pa]')
+    # set x label
+    base_sound.set_xlabel('Time[s]')
+    sound_spec.set_xlabel('Time[s]')
+    repro_sound.set_xlabel('Time[s]')
 
-# set title
-base_sound.set_title('Original signal')
-sound_spec.set_title('Spectrogram')
-repro_sound.set_title('Re-synthesized signal')
+    # set y label
+    base_sound.set_ylabel('Sound pressure[Pa]')
+    sound_spec.set_ylabel('Frequency[kHz]')
+    repro_sound.set_ylabel('Sound pressure[Pa]')
 
-plt.show()
-fig.savefig('comparision_graph_ex1.png')
+    # set title
+    base_sound.set_title('Original signal')
+    sound_spec.set_title('Spectrogram')
+    repro_sound.set_title('Re-synthesized signal')
+
+    plt.show()
+    fig.savefig('comparision_graph_ex1.png')
