@@ -1,28 +1,27 @@
+"""This module generates a spectrogram and performs an inverse transform.
+
+It reads an input WAV file and generates a spectrogram.
+The script then performs
+an inverse transform to obtain the original signal.
+
+"""
 import argparse
+
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.fftpack as fftpack
 import scipy.io.wavfile as wavfile
 import scipy.signal as signal
-import scipy.fftpack as fftpack
+
 
 def parse_args():
-    """
-    Retrieve variables from the command prompt.
-    """
+    """Retrieve variables from the command prompt."""
     parser = argparse.ArgumentParser(
         description="Generate spectrogram and inverse transform"
     )
-    parser.add_argument(
-        "--input-file",
-        type=str,
-        required=True,
-        help="input wav file")
+    parser.add_argument("--input-file", type=str, required=True, help="input wav file")
     """add nfft."""
-    parser.add_argument(
-        "--nfft",
-        type=int,
-        default=1024,
-        help="number of FFT points")
+    parser.add_argument("--nfft", type=int, default=1024, help="number of FFT points")
     parser.add_argument(
         "--hop-length",
         type=int,
@@ -34,10 +33,9 @@ def parse_args():
     )
     return parser.parse_args()
 
+
 def main():
-    """
-    main function.
-    """
+    """Generate spectrograms and inverse transforms of audio signals."""
     args = parse_args()
 
     # 音声ファイルを読み込む
@@ -59,21 +57,17 @@ def main():
 
     # スペクトログラムの計算
     spectrogram = np.zeros(
-        (1 + nfft // 2, (len(data) - nfft) // hop_length + 1),
-        dtype=np.complex128
+        (1 + nfft // 2, (len(data) - nfft) // hop_length + 1), dtype=np.complex128
     )
     for i in range(spectrogram.shape[1]):
-        segment = data[i * hop_length: i * hop_length + nfft] * window_func
+        segment = data[i * hop_length : i * hop_length + nfft] * window_func
         spectrum = fftpack.fft(segment, n=nfft, axis=0)[: 1 + nfft // 2]
         spectrogram[:, i] = spectrum
 
     # スペクトログラムの描画
     plt.figure()
     plt.imshow(
-        20 * np.log10(np.abs(spectrogram)),
-        origin="lower",
-        aspect="auto",
-        cmap="jet"
+        20 * np.log10(np.abs(spectrogram)), origin="lower", aspect="auto", cmap="jet"
     )
     plt.xlabel("Time (s)")
     plt.ylabel("Frequency (Hz)")
@@ -87,7 +81,7 @@ def main():
         spectrum = spectrogram[:, i]
         segment = fftpack.ifft(spectrum, n=nfft, axis=0)
         segment = np.real(segment) * window_func
-        time_signal[i * hop_length: i * hop_length + nfft] += segment
+        time_signal[i * hop_length : i * hop_length + nfft] += segment
 
     # 逆変換した波形のプロット
     plt.figure()
