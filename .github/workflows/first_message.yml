@@ -1,0 +1,24 @@
+name: First Message
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+
+jobs:
+  post-message:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: |
+            @${{ github.event.pull_request.user.login }}
+            課題の提出お疲れ様です！
+            レビュアーが自動で割り当てられない場合はお知らせください。
+            また、レビュアーが割り振られていても反応がない場合は気づいていない可能性があるので催促してあげてください。
+            コーディングは自動でチェックされます．できる範囲で構わないのでエラーメッセージや[こちら](https://github.com/TakedaLab/B4Lecture-2023/blob/master/docs/TIPS.md#github-actionsのciによるコーディングチェック)を参考に修正してみてください。

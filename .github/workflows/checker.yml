@@ -1,0 +1,32 @@
+name: Code Checker
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+        with:
+          options: "--check --diff"
+  formatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install flake8 and its plugins
+        run: pip install flake8 flake8-docstrings
+      - name: Run flake8
+        run: |
+          flake8 . --max-line-length=100 --ignore=H102,H103,W503,H238,E203
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: isort/isort-action@v1
