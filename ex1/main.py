@@ -25,7 +25,7 @@ def main():
     plt.plot(time, data)
     plt.xlabel('Time [sec]')
     plt.ylabel('Amplitude')
-    #plt.show()
+    plt.show()
 
     # STFTのそれぞれのパラメータ
     nfft = args.nfft
@@ -47,7 +47,7 @@ def main():
     plt.ylabel('Frequency (Hz)')
     plt.colorbar()
     plt.title('Spectrogram')
-    #plt.show()
+    plt.show()
 
     # 逆変換の計算
     time_signal = np.zeros(len(data))
