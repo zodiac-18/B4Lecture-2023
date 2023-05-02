@@ -1,16 +1,14 @@
-"""import argparse."""
 import argparse
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io.wavfile as wavfile
 import scipy.signal as signal
-
-"""import fftpack."""
 import scipy.fftpack as fftpack
 
-
 def parse_args():
+    """
+    Retrieve variables from the command prompt.
+    """
     parser = argparse.ArgumentParser(
         description="Generate spectrogram and inverse transform"
     )
@@ -36,8 +34,10 @@ def parse_args():
     )
     return parser.parse_args()
 
-
 def main():
+    """
+    main function.
+    """
     args = parse_args()
 
     # 音声ファイルを読み込む
