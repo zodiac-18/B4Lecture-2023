@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-Fs = 512                                    # frame size
-overlap_r = 0.9                              # overlap rate between 0 to 1
-spec_ylim = 20000                            # set limit of frequency
 parser = argparse.ArgumentParser(description='This is a program to generate sound\'s spectrogram')
 parser.add_argument('arg1',help='the path of sound')
+parser.add_argument('--arg2',help='frame size recommend between 128 to 2048 ', default= 512)
+parser.add_argument('--arg3',help='overlap rate between 0 to 1', default=0.5)
+parser.add_argument('--arg4',help='limit of spectrogram\'s frequency', default=25000)
 
 def load_sound(sound_path):
     """Load sound file."""
@@ -50,7 +50,10 @@ def istft(data, overlap, length):
 if __name__ == '__main__':
 
     args = parser.parse_args()
-    data, samplerate = load_sound(args.arg1)
+    Fs = args.arg2
+    overlap_r = args.arg3
+    spec_ylim = args.arg4
+    data, samplerate = load_sound(args.arg1)  # arg1 is sound path
     frame_group2, freq, frame_l = stft(data, overlap_r, Fs, samplerate)
     origin_sound = istft(frame_group2, overlap_r, data.shape[0])
 
@@ -75,7 +78,8 @@ if __name__ == '__main__':
     repro_sound.set_xlim(0, len(data) / samplerate)
 
     # set y limit
-    sound_spec.set_ylim(0,spec_ylim)
+    if spec_ylim <= max(freq):      # if maximum freq bigger than limit then set y-axis limit
+        sound_spec.set_ylim(0,spec_ylim)
 
     # plot data
     base_sound.plot(x_t, data)
