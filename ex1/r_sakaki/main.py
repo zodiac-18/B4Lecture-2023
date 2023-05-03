@@ -18,8 +18,8 @@ def stft(data, win_size, overlap):
     step = win_size-overlap
 
     for i in range(int((data.shape[0]-overlap)/step)):
-      tmp = data[i*step: i*step+win_size] * win_func
-      tmp_fft = np.fft.rfft(tmp)
+      tmp = data[i*step: i*step+win_size] * win_func  # 窓関数をつける
+      tmp_fft = np.fft.rfft(tmp)    # フーリエ変換
       spec.append(tmp_fft)
     return np.transpose(spec)
 
@@ -29,35 +29,33 @@ def istft(spec, win_size, overlap):
     step = win_size-overlap
     spec = np.transpose(spec)
 
-    tmp_istft = np.fft.irfft(spec)
-    tmp_istft = tmp_istft / win_func
-    tmp_istft = tmp_istft[:, :step]
+    tmp_istft = np.fft.irfft(spec)    # 逆変換
+    tmp_istft = tmp_istft / win_func  # 窓関数を外す
+    tmp_istft = tmp_istft[:, :step]   # オーバーラップを外す
     amp = tmp_istft.reshape(-1)
     return amp
     
 
-
 # 音声の読込
-samplerate, data, time_array = load_file("taiko.mp3")
+samplerate, data, time_array = load_file("sample.mp3")
+
+# 窓関数とオーバーラップの設定
+win_size=1024
+overlap=512
 
 # 短時間フーリエ変換
-### 結果の画像を見るとすぐわかるのですが、マイナスの値が入ってしまっています。
-### どこかが違うと思うのですが、それがわからないです。
-### よろしくお願いします
-win_size=256
-overlap=128
 spectrogram = stft(data, win_size, overlap)
-spectrogram_db = 20*np.log(np.abs(spectrogram))
-# spectrogram_db = librosa.amplitude_to_db(np.abs(spectrogram))
+spectrogram_db = 20*np.log(np.abs(spectrogram))   # db変換
 
 # フーリエ逆変換
 new_data = istft(spectrogram, win_size, overlap)
 
-# 各グラフの表示
+
+# グラフの表示の準備
 fig, ax = plt.subplots(3, 1, figsize=(10,10))
 fig.subplots_adjust(hspace=0.5)
 
-# 元の音声を表示
+# 元の音声の波形を表示
 librosa.display.waveshow(data, sr=samplerate, ax=ax[0])
 ax[0].set(title="Original Signal", ylabel="Amplitude", xlim=[0, time_array[-1]])
 
@@ -65,7 +63,7 @@ ax[0].set(title="Original Signal", ylabel="Amplitude", xlim=[0, time_array[-1]])
 img = librosa.display.specshow(
     spectrogram_db,
     sr=samplerate,
-    hop_length=128,
+    hop_length=win_size-overlap,
     ax=ax[1],
     x_axis="time",
     y_axis="log",
