@@ -70,13 +70,14 @@ jobs:
           
           echo "reviewers_mention=${reviewers_mention[*]}" >> ${GITHUB_ENV}
 
-          for reviewer in ${reviewers[@]}; do
-            curl -X POST \
-              -H "Accept: application/vnd.github.v3+json" \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
-              -d '{"reviewers": ["${reviewer}"] }'
-          done
+          reviewers_string=$(printf '"%s", ' "${reviewers[@]}" | sed 's/, $//')
+          reviewers_string="[$reviewers_string]"
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers \
+            -d "{\"reviewers\": ${reviewers_string} }"
+          
       - name: Comment PR
         if: ${{ env.is_labeled == 'true' && env.is_requested == 'false' }}
         uses: thollander/actions-comment-pull-request@v1
