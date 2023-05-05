@@ -1,11 +1,11 @@
 """Main."""
+import sys
+
 import librosa
 import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 import spectrogram as sp
-import sys
-
 
 if __name__ == "__main__":
     """main"""
