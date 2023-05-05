@@ -17,5 +17,6 @@ def main():
     window = np.hamming(framesize)
     data, samplerate = sf.read(sound_file)
     time = len(data)/samplerate
-    stft_wave = stft(data, framesize)
+    
+    stft_wave = stft(data, framesize, overlap, window)
     
