@@ -91,6 +91,7 @@ def main():
     # Transpose the spectrogram to make the vertical axis the frequency and the horizontal axis the time
     im = ax2.imshow(spectrogram_amp.T, extent=[0, time, 0, samplerate/2000]
                     , aspect='auto')
+    ax2.set_xlabel("Time[s]")
     ax2.set_ylabel("Frequency [kHz]")
     ax2.set_xlim(0, time)
     ax2.set_ylim(0, samplerate/2000)
@@ -101,7 +102,7 @@ def main():
     # Create audio files from re-synthesized waveforms
     sf.write("re-miku.wav", istft_wave, samplerate)
     
-    # Plot original re-synthesized waveform
+    # Plot re-synthesized waveform
     ax3 = fig.add_subplot(3,1,3)
     # Create a time axis
     t_3 = np.arange(0,len(istft_wave)) / samplerate
@@ -110,6 +111,7 @@ def main():
     plt.xlabel("Time[s]")
     plt.ylabel("Magnitude")
     plt.savefig("wave.png")
+    plt.tight_layout()
     plt.show()
     plt.close()
 
