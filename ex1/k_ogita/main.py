@@ -1,3 +1,4 @@
+"""Generate spectrogram and re-synthesized waveform"""
 #!/usr/bin/env python
 # coding: utf-8
 
@@ -64,6 +65,7 @@ def istft(spec, framesize, overlap):
 
 
 def main():
+    """Main processing part"""
     sound_file = "miku.wav"
     # Window size
     framesize = 1024
