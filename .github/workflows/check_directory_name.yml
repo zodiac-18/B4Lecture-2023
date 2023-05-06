@@ -8,6 +8,9 @@ on:
       - opened
     paths-ignore:
       - 'ex[1-9]/**'
+  push:
+    branches:
+      - master
 
 jobs:
   comment:
