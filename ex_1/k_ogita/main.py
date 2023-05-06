@@ -6,17 +6,16 @@ import matplotlib.pyplot as plt
 import soundfile as sf
 
 def stft(data, framesize, overlap):
-    """_summary_
+    """
+    Compute the short-time Fourier transform (STFT) of the input waveform.
 
     Args:
-        data (_type_): _description_
-        time (_type_): _description_
-        framesize (_type_): _description_
-        samplerate (_type_): _description_
-        overlap (_type_): _description_
+        data (ndarray): Input waveform.
+        framesize (int): Window size.
+        overlap (float): Percentage of overlap. Takes a value between 0 and 1.
 
     Returns:
-        ndarray: 
+        ndarray: Spectrogram of waveform.
     """
     window = np.hamming(framesize)
     split_time = int(data.shape[0]//(framesize*(1-overlap)))-1
@@ -29,8 +28,19 @@ def stft(data, framesize, overlap):
     return np.array(stft_result)
 
 def istft(spec, framesize, overlap):
+    """
+    Compute the Inverse short-time Fourier transform (ISTFT) of the input spectrogram.
+
+    Args:
+        spec (ndarray): Input spectrogram.
+        framesize (int): Window size.
+        overlap (float): Percentage of overlap. Takes a value between 0 and 1.
+
+    Returns:
+        ndarray: Re-synthesized waveform.
+    """
     window = np.hamming(framesize)
-    # calculate the number of wave samples
+    # Calculate the number of wave samples
     num_istft = spec.shape[0] * framesize*(1-overlap) + framesize
     istft_result = np.zeros(int(num_istft))
     pos = 0
