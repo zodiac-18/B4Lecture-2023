@@ -67,8 +67,7 @@ def istft(spec, framesize, overlap):
 
 def main():
     """
-    Create a spectrogram from the read waveform and
-    calculate the original waveform from the spectrogram.
+    Create a spectrogram from the waveform.
     """
     sound_file = "miku.wav"
     # Window size
