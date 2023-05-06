@@ -36,7 +36,7 @@ def stft(data, framesize, overlap):
 
 def istft(spec, framesize, overlap):
     """
-    Compute the Inverse short-time Fourier transform (ISTFT) of the input spectrogram.
+    Compute the Inverse short-time Fourier transform (ISTFT) of spectrogram.
 
     Args:
         spec (ndarray): Input spectrogram.
@@ -91,7 +91,8 @@ def main():
     spectrogram_amp = np.log(np.abs(spectrogram[:, : int(framesize * (1 - overlap))]))
     ax2 = fig.add_subplot(3, 1, 2)
     ax2.set_title("Spectrogram")
-    # Transpose the spectrogram to make the vertical axis the frequency and the horizontal axis the time
+    # Transpose the spectrogram to make the vertical axis
+    # the frequency and the horizontal axis the time
     im = ax2.imshow(
         spectrogram_amp.T, extent=[0, time, 0, samplerate / 2000], aspect="auto"
     )
