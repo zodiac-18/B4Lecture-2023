@@ -1,6 +1,7 @@
-"""Generate spectrogram and re-synthesized waveform"""
 #!/usr/bin/env python
-# coding: utf-8
+# -*- coding: utf-8 -*-
+
+"""Generate spectrogram and re-synthesized waveform."""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -65,7 +66,10 @@ def istft(spec, framesize, overlap):
 
 
 def main():
-    """Main processing part"""
+    """
+    Create a spectrogram from the read waveform.
+    Calculate the original waveform from the spectrogram.
+    """
     sound_file = "miku.wav"
     # Window size
     framesize = 1024
