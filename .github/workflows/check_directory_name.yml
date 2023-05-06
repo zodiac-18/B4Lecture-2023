@@ -1,16 +1,22 @@
 name: Check Directory Name
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - master
     types:
       - opened
     paths-ignore:
       - 'ex[1-9]/**'
+  push:
+    branches:
+      - master
 
 jobs:
   comment:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
