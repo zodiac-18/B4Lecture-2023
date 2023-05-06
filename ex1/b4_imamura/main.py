@@ -18,7 +18,7 @@ def main():
 
     # 音源波形を表示
     time = np.arange(0, len(sample_data)) / sample_rate
-    fig, ax = plt.subplots(3, 1, layout="constrained")
+    fig, ax = plt.subplots(3, 1, layout="constrained", sharex=True)
     ax[0].set_title("Original Wave")
     ax[0].plot(time, sample_data)
     ax[0].set_xlabel("Time")
