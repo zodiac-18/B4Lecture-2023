@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import soundfile as sf
 
+
 def stft(data, framesize, overlap):
     """
     Compute the short-time Fourier transform (STFT) of the input waveform.
@@ -29,8 +30,9 @@ def stft(data, framesize, overlap):
         frame = np.fft.fft(data[int(pos):int(pos+framesize)]*window)
         stft_result.append(frame)
         pos += framesize * (1 - overlap)
-        
+
     return np.array(stft_result)
+
 
 def istft(spec, framesize, overlap):
     """
@@ -52,13 +54,14 @@ def istft(spec, framesize, overlap):
     pos = 0
     for i in range(spec.shape[0]):
         # Compute the iFFT of the spectrum
-        frame = np.fft.ifft(spec[i,:])
+        frame = np.fft.ifft(spec[i, :])
         frame = np.real(frame) * window
         # Add windowed frames to the array
         istft_result[int(pos):int(pos+framesize)] += frame
         pos += framesize * (1 - overlap)
-    
+
     return istft_result
+
 
 def main():
     sound_file = 'miku.wav'
@@ -72,40 +75,41 @@ def main():
     time = len(data)/samplerate
     # Compute the spectrogram of the waveform
     spectrogram = stft(data, framesize, overlap)
-    
+
     # Plot original waveform
     fig = plt.figure()
-    ax1 = fig.add_subplot(3,1,1)
+    ax1 = fig.add_subplot(3, 1, 1)
     # Create a time axis
-    t_1 = np.arange(0,len(data)) / samplerate
+    t_1 = np.arange(0, len(data)) / samplerate
     ax1.plot(t_1, data)
     plt.title("Original signal")
     plt.xlabel("Time[s]")
     plt.ylabel("Magnitude")
-    
+
     # Plot spectrogram
     # Calculate the logarithm of the spectrogram for plotting
-    spectrogram_amp = np.log(np.abs(spectrogram[:,:int(framesize*(1-overlap))]))
-    ax2 = fig.add_subplot(3,1,2)
+    spectrogram_amp = np.log(
+        np.abs(spectrogram[:, :int(framesize*(1-overlap))]))
+    ax2 = fig.add_subplot(3, 1, 2)
     ax2.set_title("Spectrogram")
     # Transpose the spectrogram to make the vertical axis the frequency and the horizontal axis the time
-    im = ax2.imshow(spectrogram_amp.T, extent=[0, time, 0, samplerate/2000]
-                    , aspect='auto')
+    im = ax2.imshow(spectrogram_amp.T, extent=[
+                    0, time, 0, samplerate/2000], aspect='auto')
     ax2.set_xlabel("Time[s]")
     ax2.set_ylabel("Frequency [kHz]")
     ax2.set_xlim(0, time)
     ax2.set_ylim(0, samplerate/2000)
     fig.colorbar(im, ax=ax2, format="%+2.f dB")
-    
+
     # Compute the original waveform from the spectrogram
     istft_wave = istft(spectrogram, framesize, overlap)
     # Create audio files from re-synthesized waveforms
     sf.write("re-miku.wav", istft_wave, samplerate)
-    
+
     # Plot re-synthesized waveform
-    ax3 = fig.add_subplot(3,1,3)
+    ax3 = fig.add_subplot(3, 1, 3)
     # Create a time axis
-    t_3 = np.arange(0,len(istft_wave)) / samplerate
+    t_3 = np.arange(0, len(istft_wave)) / samplerate
     ax3.plot(t_3, istft_wave)
     plt.title("Re-Synhesized signal")
     plt.xlabel("Time[s]")
@@ -115,6 +119,6 @@ def main():
     plt.show()
     plt.close()
 
-    
+
 if "__main__" == __name__:
     main()
