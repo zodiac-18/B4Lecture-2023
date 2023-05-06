@@ -21,13 +21,13 @@ def stft(data, framesize, overlap):
     # Use a hamming window
     window = np.hamming(framesize)
     # Calculate the number of times to do windowing
-    split_time = int(data.shape[0]//(framesize*(1-overlap)))-1
+    split_time = int(data.shape[0] // (framesize * (1 - overlap))) - 1
     # Make an empty list to store the spectrogram
     stft_result = []
     pos = 0
     # Apply FFT to windowed frames
     for _ in range(split_time):
-        frame = np.fft.fft(data[int(pos):int(pos+framesize)]*window)
+        frame = np.fft.fft(data[int(pos) : int(pos + framesize)] * window)
         stft_result.append(frame)
         pos += framesize * (1 - overlap)
 
@@ -48,7 +48,7 @@ def istft(spec, framesize, overlap):
     """
     window = np.hamming(framesize)
     # Calculate the number of samples in the re-synthesized waveform
-    num_istft = spec.shape[0] * framesize*(1-overlap) + framesize
+    num_istft = spec.shape[0] * framesize * (1 - overlap) + framesize
     # Create an array to store the re-synthesized waveforms
     istft_result = np.zeros(int(num_istft))
     pos = 0
@@ -57,14 +57,14 @@ def istft(spec, framesize, overlap):
         frame = np.fft.ifft(spec[i, :])
         frame = np.real(frame) * window
         # Add windowed frames to the array
-        istft_result[int(pos):int(pos+framesize)] += frame
+        istft_result[int(pos) : int(pos + framesize)] += frame
         pos += framesize * (1 - overlap)
 
     return istft_result
 
 
 def main():
-    sound_file = 'miku.wav'
+    sound_file = "miku.wav"
     # Window size
     framesize = 1024
     # Rate of overlap
@@ -72,7 +72,7 @@ def main():
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
     # Calculate the playback time of the input waveform
-    time = len(data)/samplerate
+    time = len(data) / samplerate
     # Compute the spectrogram of the waveform
     spectrogram = stft(data, framesize, overlap)
 
@@ -88,17 +88,17 @@ def main():
 
     # Plot spectrogram
     # Calculate the logarithm of the spectrogram for plotting
-    spectrogram_amp = np.log(
-        np.abs(spectrogram[:, :int(framesize*(1-overlap))]))
+    spectrogram_amp = np.log(np.abs(spectrogram[:, : int(framesize * (1 - overlap))]))
     ax2 = fig.add_subplot(3, 1, 2)
     ax2.set_title("Spectrogram")
     # Transpose the spectrogram to make the vertical axis the frequency and the horizontal axis the time
-    im = ax2.imshow(spectrogram_amp.T, extent=[
-                    0, time, 0, samplerate/2000], aspect='auto')
+    im = ax2.imshow(
+        spectrogram_amp.T, extent=[0, time, 0, samplerate / 2000], aspect="auto"
+    )
     ax2.set_xlabel("Time[s]")
     ax2.set_ylabel("Frequency [kHz]")
     ax2.set_xlim(0, time)
-    ax2.set_ylim(0, samplerate/2000)
+    ax2.set_ylim(0, samplerate / 2000)
     fig.colorbar(im, ax=ax2, format="%+2.f dB")
 
     # Compute the original waveform from the spectrogram
