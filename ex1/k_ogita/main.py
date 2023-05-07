@@ -15,10 +15,10 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument("path", help="the path to the audio file")
 parser.add_argument(
-    "-f", "--framesize", help="the size of window", default=1024, type=int
+    "-f", "--framesize", help="the size of window", default=2048, type=int
 )
 parser.add_argument(
-    "-o", "--overlap", help="the rate of overlap", default=0.5, type=float
+    "-o", "--overlap", help="the rate of overlap", default=0.8, type=float
 )
 
 
