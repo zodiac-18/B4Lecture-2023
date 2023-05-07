@@ -10,17 +10,6 @@ import numpy as np
 import soundfile as sf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-parser = argparse.ArgumentParser(
-    description="This program generates soundwave and re-synthesized waveform from input"
-)
-parser.add_argument("path", help="the path to the audio file")
-parser.add_argument(
-    "-f", "--framesize", help="the size of window", default=2048, type=int
-)
-parser.add_argument(
-    "-o", "--overlap", help="the rate of overlap", default=0.8, type=float
-)
-
 
 def stft(data, framesize, overlap):
     """
@@ -85,6 +74,16 @@ def istft(spec, framesize, overlap):
 
 def main():
     """Create a spectrogram from the waveform."""
+    parser = argparse.ArgumentParser(
+        description="This program generates soundwave and re-synthesized waveform from input"
+    )
+    parser.add_argument("path", help="the path to the audio file")
+    parser.add_argument(
+        "-f", "--framesize", help="the size of window", default=2048, type=int
+    )
+    parser.add_argument(
+        "-o", "--overlap", help="the rate of overlap", default=0.8, type=float
+    )
     args = parser.parse_args()
 
     sound_file = args.path
