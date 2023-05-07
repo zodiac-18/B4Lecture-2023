@@ -3,10 +3,18 @@
 
 """Generate spectrogram and re-synthesized waveform."""
 
+import argparse
+
 import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 
+parser= argparse.ArgumentParser(
+        description="This program generates soundwave and re-synthesized waveform from input"
+    )
+parser.add_argument("path", help="the path to the audio file")
+parser.add_argument("-f", "framesize", help="the size of window", default = 1024, type = int)
+parser.add_argument("-o", "overlap", help="the rate of overlap", default = 0.5, type = float)
 
 def stft(data, framesize, overlap):
     """
@@ -67,11 +75,13 @@ def istft(spec, framesize, overlap):
 
 def main():
     """Create a spectrogram from the waveform."""
-    sound_file = "miku.wav"
+    args = parser.parse_args()
+    
+    sound_file = args.path
     # Window size
-    framesize = 1024
+    framesize = args.framesize
     # Rate of overlap
-    overlap = 0.5
+    overlap = args.overlap
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
     # Calculate the playback time of the input waveform
