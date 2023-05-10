@@ -91,6 +91,7 @@ def main():
     framesize = args.framesize
     # Rate of overlap
     overlap = args.overlap
+    print(overlap, framesize)
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
     # Calculate the playback time of the input waveform
@@ -138,6 +139,11 @@ def main():
     ax3 = fig.add_subplot(3, 1, 3)
     # Create a time axis
     t_3 = np.arange(0, len(istft_wave)) / samplerate
+    #if len(istft_wave) > len(data):
+    #    data = np.append(data, [0]*(len(istft_wave)-len(data)))
+    #else:
+    #    istft_wave = np.append(istft_wave, [0]*(len(data)-len(istft_wave)))
+    #print(np.mean((data-istft_wave)**2))
     ax3.plot(t_3, istft_wave)
     plt.title("Re-Synthesized signal")
     plt.xlabel("Time[s]")
