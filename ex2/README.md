@@ -30,15 +30,15 @@
 
    - 周波数特性を描画．グラフの各軸はきちんと明記
 
-   - **割り振り（2023/5/10 B4輪講終了後に修正します）**
+   - **割り振り**
 
-     * LPF: Sawada, Tanaka
+     * LPF: Kimihiro Hattori, Koki Morita
 
-     * HPF: Sato, Hayakawa
+     * HPF: Kenjiro Ide, Takehiro Imamura
 
-     * BPF: Radit, Kobayashi
+     * BPF: Tatsuru Kawanishi, Shunsuke Iwashita
 
-     * BEF: Tokida
+     * BEF: Kenichi Ogita, Ryoya Sakaki
 
 3. 畳み込み
 
