@@ -17,7 +17,7 @@ def main():
     # サンプルレートは44100Hz
 
     # 音源波形を表示
-    time = np.arange(0, len(sample_data)) / sample_rate
+    time = np.arange(0, N) / sample_rate  # サンプルレートで割って時間に変換
     fig, ax = plt.subplots(3, 1, layout="constrained", sharex=True)
     ax[0].set_title("Original Wave")
     ax[0].plot(time, sample_data)
@@ -41,7 +41,7 @@ def main():
     fft_abs = np.abs(fft[:, :dist_of_Frame]).T  # オーバーラップ部分を除きfftの結果全ての振幅を出す
 
     # fftの結果のスペクトログラムを表示
-    fft_spec = 10 * (np.log10(fft_abs))  # スペクトログラムを見やすくするための処理
+    fft_spec = 20 * (np.log10(fft_abs))  # スペクトログラムを見やすくするための処理
     ax1 = ax[1].imshow(
         fft_spec,
         origin="lower",
@@ -53,14 +53,16 @@ def main():
     ax[1].set_xlabel("Time")
     ax[1].set_ylabel("Frequency")
     fig.colorbar(ax1, ax=ax[1], aspect=5, location="right")
-    # extentでxは0 ~ サンプル数÷サンプルレート(秒数)、yは0 ~
+    # extentでxは0 ~ サンプル数/サンプルレート(秒数)、yは0 ~ サンプルレート/2(Hz)までを表示
 
     # フーリエ逆変換
     ifft = np.zeros(N)  # 逆変換の結果格納
     start_ifft = 0  # 逆変換した波形を格納するスタート位置
     for fft_per in fft_for_irfft:
-        ifft_per = np.fft.ifft(fft_per)  # 逆変換
-        ifft[start_ifft : start_ifft + F_size] += np.real(ifft_per)  # 逆変換結果を格納
+        ifft_per = np.fft.ifft(fft_per) / win  # 逆変換
+        ifft[start_ifft : start_ifft + dist_of_Frame] += np.real(
+            ifft_per[:dist_of_Frame]
+        )  # 逆変換結果を格納
         start_ifft += dist_of_Frame
 
     # 逆変換の結果の波形を表示
@@ -73,6 +75,7 @@ def main():
     fig.savefig("ex1.png")
     plt.clf()
     plt.close()
+    soundfile.write(file="Ifft_voice.wav", data=ifft, samplerate=sample_rate)
 
 
 if "__main__" == __name__:
