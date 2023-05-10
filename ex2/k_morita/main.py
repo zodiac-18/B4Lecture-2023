@@ -19,7 +19,7 @@ if __name__ == "__main__":
     y, samplerate = librosa.load(soundfile, sr=None)
     nyquist_freq = samplerate // 2
 
-    filter = f.create_lpf(4000, samplerate, 101)
+    filter = f.create_lpf(2000, samplerate, 101)
     filtered_y = f.conv(y, filter)
 
     # stft
@@ -34,14 +34,20 @@ if __name__ == "__main__":
     x = np.linspace(0, total_time, total_frame)
 
     # draw input wave
-    axes[0].plot(x, filtered_y[:total_frame])
+    axes[0].plot(x, y[:total_frame])
     axes[0].set_title("input wave")
     axes[0].set_xlabel("Time [s]")
     axes[0].set_ylabel("Magnitude [dB]")
     axes[0].set_xlim(0, total_time)
 
+    axes[1].plot(x, filtered_y[:total_frame])
+    axes[1].set_title("filtered wave")
+    axes[1].set_xlabel("Time [s]")
+    axes[1].set_ylabel("Magnitude [dB]")
+    axes[1].set_xlim(0, total_time)
+
     # draw spectrogram
-    im = axes[1].imshow(
+    im = axes[2].imshow(
         mag_db,
         cmap="jet",
         aspect="auto",
@@ -49,12 +55,12 @@ if __name__ == "__main__":
         vmax=30,
         extent=[0, total_time, 0, nyquist_freq],
     )
-    axes[1].set_title("spectrogram")
-    axes[1].set_xlabel("Time [s]")
-    axes[1].set_ylabel("Frequency [Hz]")
-    axes[1].set_xlim(0, total_time)
-    axes[1].set_ylim(0, nyquist_freq)
-    plt.colorbar(mappable=im, ax=axes[1], orientation="horizontal")
+    axes[2].set_title("spectrogram")
+    axes[2].set_xlabel("Time [s]")
+    axes[2].set_ylabel("Frequency [Hz]")
+    axes[2].set_xlim(0, total_time)
+    axes[2].set_ylim(0, nyquist_freq)
+    plt.colorbar(mappable=im, ax=axes[2], orientation="horizontal")
 
     plt.tight_layout()
     plt.savefig("result.png")
