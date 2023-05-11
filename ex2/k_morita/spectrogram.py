@@ -96,7 +96,7 @@ def magphase(complex):
             phase (np.ndarray): phase
     """
     mag = np.abs(complex)
-    phase = np.exp(1.0j * np.angle(complex))
+    phase = np.angle(complex)
     return mag, phase
 
 
@@ -111,3 +111,16 @@ def mag_to_db(mag):
     """
     db = 20 * np.log10(mag)
     return db
+
+
+def rad_to_deg(rad):
+    """Convert radian-scaled data into degree-scaled data.
+
+    Args:
+        rad (np.ndarray, float): radian-scaled data or array
+
+    Returns:
+        deg: degree-scaled value
+    """
+    deg = rad * 180. / np.pi
+    return deg
