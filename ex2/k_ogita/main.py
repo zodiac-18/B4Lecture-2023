@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Generate spectrogram and re-synthesized waveform."""
+"""Make a digital filter."""
 
 import argparse
 
@@ -10,72 +10,62 @@ import numpy as np
 import soundfile as sf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+import spec as s
 
-def stft(data, framesize, overlap):
+
+def conv(sig1, sig2):
     """
-    Compute the short-time Fourier transform (STFT) of the input waveform.
+    Convolute two signals.
 
     Args:
-        data (ndarray): Input waveform.
-        framesize (int): Window size.
-        overlap (float): Overlap rate. Takes a value between 0 and 1.
+        sig1 (ndarray): Input signal.
+        sig2 (ndarray): Input signal.
 
     Returns:
-        ndarray: Spectrogram of waveform.
+        ndarray: Convoluted siganl.
     """
-    # Use a hamming window
-    window = np.hamming(framesize)
-    step = int(framesize * (1 - overlap))
-    # Calculate the number of times to do windowing
-    split_time = int(data.shape[0] // step) - 1
-    # Make an empty list to store the spectrogram
-    stft_result = []
-    pos = 0
-    # Apply FFT to windowed frames
-    for _ in range(split_time):
-        if pos + framesize > data.shape[0]:
-            break
-        frame = np.fft.fft(data[int(pos) : int(pos + framesize)] * window)
-        stft_result.append(frame)
-        pos += step
+    conv_length = len(sig1) + len(sig2) - 1
+    conv_sig = np.zeros(conv_length, dtype = np.float32)
+    
+    # Apply 0-padding on each signal.
+    sig1_pad = np.hstack([sig1, np.zeros(len(sig2) - 1)])
+    sig2_pad = np.hstack([sig2, np.zeros(len(sig1) - 1)])
+    
+    for n in range(conv_length):
+        for m in range(len(sig2)):
+            conv_sig[n] += sig1_pad[n - m] * sig2_pad[m]
 
-    return np.array(stft_result)
-
-
-def istft(spec, framesize, overlap):
+    return conv_sig
+    
+def bef(cf1, cf2, tap):
     """
-    Compute the Inverse short-time Fourier transform (ISTFT) of spectrogram.
+    Create a base elimination filter.
 
     Args:
-        spec (ndarray): Input spectrogram.
-        framesize (int): Window size.
-        overlap (float): Overlap rate. Takes a value between 0 and 1.
+        cf1 (float): cut-off frequency (cf1 < cf2)
+        cf2 (float): cut-off frequency (cf1 < cf2)
+        tap (int): the number of taps on filter
 
     Returns:
-        ndarray: Re-synthesized waveform.
+        ndarray: Base elimination filter.
     """
-    window = np.hamming(framesize)
-    step = int(framesize * (1 - overlap))
-    # Calculate the number of samples in the re-synthesized waveform
-    num_istft = spec.shape[0] * step + framesize
-    # Create an array to store the re-synthesized waveforms
-    istft_result = np.zeros(int(num_istft))
-    pos = 0
-    for i in range(spec.shape[0]):
-        # Compute the iFFT of the spectrum
-        frame = np.fft.ifft(spec[i, :])
-        frame = np.real(frame) / window
-        # Add unwindowed frames to the array
-        istft_result[int(pos) : int(pos + step)] += frame[0:step]
-        pos += step
-
-    return istft_result
+    h = np.zeros(tap)
+    window = np.hamming(tap)
+    
+    for n in range(tap):
+        if n == 0:
+            h[n] = 1 - (cf2 - cf1) / np.pi
+        else:
+            h[n] = 1 / np.pi * (cf1 * np.sinc(cf1 * n) - cf2 * np.sinc(cf2 * n))
+    h_norm = h / np.sum(h)
+    h_gain = h_norm * (1 / np.max(np.abs(np.fft.fft(h_norm)))) 
+    return h_gain * window
 
 
 def main():
-    """Create a spectrogram from the waveform."""
+    """Run through the input audio through the filter."""
     parser = argparse.ArgumentParser(
-        description="This program generates soundwave and re-synthesized waveform from input"
+        description="This program generates filtered audiowave"
     )
     parser.add_argument("path", help="the path to the audio file")
     parser.add_argument(
@@ -84,6 +74,12 @@ def main():
     parser.add_argument(
         "-o", "--overlap", help="the rate of overlap", default=0.8, type=float
     )
+    parser.add_argument(
+        "-cf", "--cutoff", help="cut-off frequency (two values are required)", default=[2000, 4000], type=int, nargs=2
+    )
+    parser.add_argument(
+        "-t", "--tap", help="the number of taps on filter", default=101, type=int,
+    )
     args = parser.parse_args()
 
     sound_file = args.path
@@ -91,33 +87,71 @@ def main():
     framesize = args.framesize
     # Rate of overlap
     overlap = args.overlap
-    print(overlap, framesize)
+    # Cut-off frequency
+    cf1, cf2 = args.cutoff[0], args.cutoff[1]
+    if cf1 >= cf2:
+        raise ValueError("'cf2' must be greater than 'cf1'")
+    # Taps on filter
+    tap = args.tap
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
     # Calculate the playback time of the input waveform
     time = len(data) / samplerate
-    # Compute the spectrogram of the waveform
-    spectrogram = stft(data, framesize, overlap)
-
-    # Plot original waveform
+    
+    # Generate a spectrogram from the input waveform
+    original_spec = s.stft(data, framesize, overlap)
+    
+    # Convert the spectrogram into a dB-scaled spectrogram
+    db_original_spec = s.spectrogram_to_db(original_spec, samplerate)
+    
+    # Generate a base elimination filter
+    filter = bef(cf1, cf2, tap)
+    
+    # Convolute the input signal and the filter
+    filtered_wave = conv(data, filter)
+    
+    filtered_spec = s.stft(filtered_wave, framesize, overlap)
+    
+    db_filtered_spec = s.spectrogram_to_db(filtered_spec, samplerate)
+    
+    # Plot original spectrogram
     fig = plt.figure()
-    ax1 = fig.add_subplot(3, 1, 1)
+     # Plot re-synthesized waveform
+    ax0 = fig.add_subplot(4, 1, 1)
     # Create a time axis
-    t_1 = np.arange(0, len(data)) / samplerate
-    ax1.plot(t_1, data)
-    plt.title("Original signal")
-    plt.xlabel("Time[s]")
+    t_0 = np.arange(0, 101)
+    ax0.plot(t_0, filter)
+    #t_0 = np.arange(0, len(data)) / samplerate
+    #ax0.plot(t_0, data)
+    plt.title("filter")
+    plt.xlabel("n")
     plt.ylabel("Magnitude")
-
-    # Plot spectrogram
-    # Calculate the logarithm of the spectrogram for plotting
-    spectrogram_amp = 20 * np.log10(np.abs(spectrogram[:, : int(framesize // 2 + 1)]))
-    ax2 = fig.add_subplot(3, 1, 2)
-    ax2.set_title("Spectrogram")
+    # Plot filtered spectrogram
+    ax1 = fig.add_subplot(4, 1, 2)
+    ax1.set_title("Original spectrogram")
     # Transpose the spectrogram to make the vertical axis
     # the frequency and the horizontal axis the time
-    im = ax2.imshow(
-        spectrogram_amp.T,
+    im1 = ax1.imshow(
+        db_original_spec.T,
+        extent=[0, time, 0, samplerate / 2000],
+        aspect="auto",
+        origin="lower",
+    )
+    divider = make_axes_locatable(ax1)
+    cax = divider.append_axes("right", size="3%", pad=0.05)
+    ax1.set_xlabel("Time[s]")
+    ax1.set_ylabel("Frequency [kHz]")
+    ax1.set_xlim(0, time)
+    ax1.set_ylim(0, samplerate / 2000)
+    fig.colorbar(im1, ax=ax1, format="%+2.f dB", cax=cax)
+
+    # Plot filtered spectrogram
+    ax2 = fig.add_subplot(4, 2, 3)
+    ax2.set_title("Filtered spectrogram")
+    # Transpose the spectrogram to make the vertical axis
+    # the frequency and the horizontal axis the time
+    im2 = ax2.imshow(
+        db_filtered_spec.T,
         extent=[0, time, 0, samplerate / 2000],
         aspect="auto",
         origin="lower",
@@ -128,23 +162,20 @@ def main():
     ax2.set_ylabel("Frequency [kHz]")
     ax2.set_xlim(0, time)
     ax2.set_ylim(0, samplerate / 2000)
-    fig.colorbar(im, ax=ax2, format="%+2.f dB", cax=cax)
+    fig.colorbar(im2, ax=ax2, format="%+2.f dB", cax=cax)
+    
+    istft_wave = s.istft(filtered_spec, framesize, overlap)
 
-    # Compute the original waveform from the spectrogram
-    istft_wave = istft(spectrogram, framesize, overlap)
     # Create audio files from re-synthesized waveforms
     sf.write("re-miku.wav", istft_wave, samplerate)
 
     # Plot re-synthesized waveform
-    ax3 = fig.add_subplot(3, 1, 3)
+    ax3 = fig.add_subplot(4, 2, 4)
     # Create a time axis
     t_3 = np.arange(0, len(istft_wave)) / samplerate
-    #if len(istft_wave) > len(data):
-    #    data = np.append(data, [0]*(len(istft_wave)-len(data)))
-    #else:
-    #    istft_wave = np.append(istft_wave, [0]*(len(data)-len(istft_wave)))
-    #print(np.mean((data-istft_wave)**2))
     ax3.plot(t_3, istft_wave)
+    #t_3 = np.arange(0, len(data)) / samplerate
+    #ax3.plot(t_3, data)
     plt.title("Re-Synthesized signal")
     plt.xlabel("Time[s]")
     plt.ylabel("Magnitude")
