@@ -89,7 +89,6 @@ def main():
     # 初期値の設定
     fig, ax = plt.subplots(4, 1, layout="constrained", sharex=True)
     fig2, ax2 = plt.subplots(3, 1, layout="constrained")
-    sample_rate = 44100  # サンプルレート
     div_num = 200  # フィルターの分割数
     cut_off_frequency = 5000  # 遮断周波数
 
