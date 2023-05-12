@@ -7,7 +7,7 @@ import soundfile
 
 
 def conv(left: np.ndarray, right: np.ndarray):
-    """calculate convolution.
+    """Calculate convolution.
 
     Args:
         left (np.ndarray): The left argument.
