@@ -71,6 +71,7 @@ def istft(spec, framesize, overlap):
 
     return istft_result
 
+
 def spectrogram_to_db(spec, framesize):
     """
     Convert a spectrogram into a dB-scaled spectrogram.
@@ -153,11 +154,11 @@ def main():
     ax3 = fig.add_subplot(3, 1, 3)
     # Create a time axis
     t_3 = np.arange(0, len(istft_wave)) / samplerate
-    #if len(istft_wave) > len(data):
+    # if len(istft_wave) > len(data):
     #    data = np.append(data, [0]*(len(istft_wave)-len(data)))
-    #else:
+    # else:
     #    istft_wave = np.append(istft_wave, [0]*(len(data)-len(istft_wave)))
-    #print(np.mean((data-istft_wave)**2))
+    # print(np.mean((data-istft_wave)**2))
     ax3.plot(t_3, istft_wave)
     plt.title("Re-Synthesized signal")
     plt.xlabel("Time[s]")

@@ -66,6 +66,7 @@ def bef(cf1, cf2, tap, samplerate):
         tap += 1
     window = np.hamming(tap + 1)
 
+    # Converts normalized cut-off frequency to angular frequency
     cw1 = 2 * np.pi * cf1 / samplerate
     cw2 = 2 * np.pi * cf2 / samplerate
 
@@ -142,7 +143,6 @@ def main():
 
     freq = np.fft.fftfreq(tap, d=1.0 / samplerate)[: tap // 2 + 1] / 1000
 
-    # Plot original spectrogram
     fig1, ax1 = plt.subplots(2, 1, figsize=(10, 10))
     # Plot frequency response of BEF
     ax1[0].plot(freq, filter_abs)
