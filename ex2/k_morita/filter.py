@@ -18,7 +18,7 @@ def create_lpf(fc, sr, N, win_func=np.hamming):
         lpf (np.ndarray): low pass filter matrix
     """
     fc_norm = fc / (sr // 2)
-    ideal_lpf = np.sinc(fc_norm * (np.arange(N) - (N - 1) / 2))
+    ideal_lpf = np.sinc(fc_norm * (np.arange(N) - (N - 1) / 2)) * fc_norm
     window = win_func(N)
 
     return ideal_lpf * window
