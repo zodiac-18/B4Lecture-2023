@@ -71,19 +71,19 @@ def istft(spec, framesize, overlap):
 
     return istft_result
 
-def spectrogram_to_db(spec, samplerate):
+def spectrogram_to_db(spec, framesize):
     """
     Convert a spectrogram into a dB-scaled spectrogram.
 
     Args:
         spec (ndarray): Spectrogram.
-        samplerate (int): Samplerate of the spectrogram.
+        framesize (int): Window size
 
     Returns:
         ndarray: dB-scaled spectrogram.
     """
-    nyquist_freq = samplerate // 2
-    return 20 * np.log10(np.abs(spec[:, : nyquist_freq + 1]))
+
+    return 20 * np.log10(np.abs(spec[:, : framesize // 2 + 1]))
 
 
 def main():
