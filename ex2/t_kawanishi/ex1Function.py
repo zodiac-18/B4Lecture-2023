@@ -123,19 +123,11 @@ def show_spectrogram(
     )
 
     # plot spectrogram
-    group = np.zeros(((len(frame_group)), len(frame_group[0])))
-    for i in range(len(frame_group)):
-        for j in range(len(frame_group[i])):
-            x = np.abs(frame_group[i][j])
-            if x == 0:
-                group[i][j] = x
-            else:
-                group[i][j] = 20 * np.log(x)
     fig, ax = plt.subplots(figsize=(5, 5))
     pcm = ax.pcolormesh(
         spec_t,
         freq,
-        group,
+        20 * np.log(np.abs(frame_group)),
         cmap="plasma",
         shading="nearest",
         vmin=-500,

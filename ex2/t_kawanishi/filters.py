@@ -2,6 +2,22 @@
 import numpy as np
 
 
+# sinc function
+def sinc(x: float) -> float:
+    """Sinc function.
+
+    Args:
+        x (float): data to adapt to sinc
+
+    Returns:
+        float: outcome of six(x)/x
+    """
+    if x == 0:
+        return 1
+    else:
+        return np.sin(x) / x
+
+
 # bond pass filter
 def bpf(low_f: int, high_f: int, sample_rate: int, f_size: int) -> np.ndarray:
     """Generate bond pass filter.
@@ -23,9 +39,7 @@ def bpf(low_f: int, high_f: int, sample_rate: int, f_size: int) -> np.ndarray:
     filter = np.zeros(f_size + 1)
     cnt = 0
     for i in range(-f_size // 2, f_size // 2 + 1):
-        filter[cnt] = (
-            high_w * np.sinc(high_w * i / np.pi) - low_w * np.sinc(low_w * i / np.pi)
-        ) / np.pi
+        filter[cnt] = (high_w * sinc(high_w * i) - low_w * sinc(low_w * i)) / np.pi
         cnt += 1
 
     return filter * np.hamming(f_size + 1)
@@ -52,12 +66,8 @@ def bef(low_f: int, high_f: int, sample_rate: int, f_size: int) -> np.ndarray:
     cnt = 0
     for i in range(-f_size // 2, f_size // 2 + 1):
         filter[cnt] = (
-            np.sinc(i)
-            + (
-                -high_w * np.sinc(high_w * i / np.pi)
-                + low_w * np.sinc(low_w * i / np.pi)
-            )
-            / np.pi
+            sinc(np.pi * i)
+            + (-high_w * sinc(high_w * i) + low_w * sinc(low_w * i)) / np.pi
         )
         cnt += 1
 
@@ -83,7 +93,7 @@ def lpf(frequency: int, sample_rate: int, f_size: int) -> np.ndarray:
     filter = np.zeros(f_size + 1)
     cnt = 0
     for i in range(-f_size // 2, f_size // 2 + 1):
-        filter[cnt] = w_f * np.sinc(w_f * i / np.pi) / np.pi
+        filter[cnt] = w_f * sinc(w_f * i) / np.pi
         cnt += 1
 
     return filter * np.hamming(f_size + 1)
@@ -107,9 +117,7 @@ def hpf(frequency: int, sample_rate: int, f_size: int) -> np.ndarray:
     filter = np.zeros(f_size + 1)
     cnt = 0
     for i in range(-f_size // 2, f_size // 2 + 1):
-        filter[cnt] = (
-            np.sinc(np.pi * i / np.pi) - (w_f * np.sinc(w_f * i / np.pi)) / np.pi
-        )
+        filter[cnt] = sinc(np.pi * i) - (w_f * sinc(w_f * i)) / np.pi
         cnt += 1
 
     return filter * np.hamming(f_size + 1)
