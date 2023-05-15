@@ -64,9 +64,9 @@
 
 ## 結果例
 
-![周波数特性](./fig/frequency_response.png)
+![周波数特性](./figs/frequency_response.png)
 
-![スペクトログラム](./fig/spectrogram.png)
+![スペクトログラム](./figs/spectrogram.png)
 
 ## ヒント
 
