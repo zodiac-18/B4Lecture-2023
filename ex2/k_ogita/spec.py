@@ -83,7 +83,6 @@ def spectrogram_to_db(spec, framesize):
     Returns:
         ndarray: dB-scaled spectrogram.
     """
-
     return 20 * np.log10(np.abs(spec[:, : framesize // 2 + 1]))
 
 
