@@ -5,6 +5,11 @@ import numpy as np
 import spectrogram as sp
 
 
+def sinc(x, e=1e-5):
+    """Sinc function."""
+    return np.piecewise(x, [x == 0, x != 0], [1, lambda x: np.sin(x)/x])
+
+
 def create_lpf(fc, sr, N, win_func=np.hamming):
     """Create LPF function.
 
@@ -18,7 +23,7 @@ def create_lpf(fc, sr, N, win_func=np.hamming):
         lpf (np.ndarray): low pass filter matrix
     """
     fc_norm = fc / (sr // 2)
-    ideal_lpf = np.sinc(fc_norm * (np.arange(N) - (N - 1) / 2)) * fc_norm
+    ideal_lpf = sinc(fc_norm * (np.arange(N) - (N - 1) / 2) * np.pi) * fc_norm
     window = win_func(N)
 
     return ideal_lpf * window
@@ -59,7 +64,7 @@ if __name__ == "__main__":
     filter = create_lpf(cutoff_freq, samplerate, N)
     mag, phase = sp.magphase(np.fft.fft(filter))
     mag_db = sp.mag_to_db(mag)
-    phase_deg = sp.rad_to_deg(phase)
+    phase = np.unwrap(phase)
 
     fig, axes = plt.subplots(2, 1, figsize=(12, 8))
     x = np.linspace(0, samplerate, len(mag_db))
@@ -69,13 +74,11 @@ if __name__ == "__main__":
     axes[0].set_ylabel("Magnitude [dB]")
     axes[0].set_xlim(0, nyquist_freq)
 
-    axes[1].plot(x, phase_deg)
+    axes[1].plot(x, phase)
     axes[1].set_xlabel("Frequency [Hz]")
     axes[1].set_ylabel("Phase [rad]")
     axes[1].set_xlim(0, nyquist_freq)
-    axes[1].set_ylim(-200, 20)
+    axes[1].set_ylim(-50, 20)
 
     plt.tight_layout()
     plt.savefig("filter.png")
-
-    # plt.show()
