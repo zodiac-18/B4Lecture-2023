@@ -79,8 +79,7 @@ def highpass_filer(
     x = np.array([t for t in range(-div_num // 2, div_num // 2)])
     hpf = (np.sinc(x) - np.sinc(cut_off_fq_to_time * x) * cut_off_fq_to_time) * window(
         div_num
-    )  # なんでpiいらん?
-    # hpf = np.sinc(cut_off_fq_to_time * x) * cut_off_fq_to_time * window(div_num)
+    )
     return hpf
 
 
@@ -116,7 +115,7 @@ def main():
     ax2[1].set_xlabel("Frequency[Hz]")
     ax2[1].set_ylabel("Angle[rad]")
     ax2[1].plot(
-        freq[: div_num // 2], np.angle(hpf_fft[: div_num // 2])
+        freq[: div_num // 2], np.unwrap(np.angle(hpf_fft[: div_num // 2]), period=np.pi) * 180 / np.pi
     )  # ハイパスフィルタの位相情報を出力
     ax2[2].set_title("Filter preview")
     ax2[2].set_xlabel("The number of the sample")
