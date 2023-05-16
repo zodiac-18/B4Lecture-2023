@@ -2,25 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-def model(x, N):
-    """Model function."""
-    X = np.concatenate([x**i for i in range(0, N+1)], axis=1)
-    return X
-
-
-def calc_coef(X, y):
-    """Calculate coefficients."""
-    beta = np.linalg.inv(X.T @ X) @ X.T @ y
-    return beta
-
-
-def expect(beta, x):
-    """Expect function."""
-    y = np.zeros_like(x)
-    for i, b in enumerate(beta):
-        y += b * x**i
-    return y
+import linear_regression as mylr
 
 
 if __name__ == "__main__":
@@ -31,8 +13,8 @@ if __name__ == "__main__":
     x, y = x.reshape(-1, 1), y.reshape(-1, 1)
 
     # generate model & calcurate coefficients
-    X = model(x, 1)
-    beta = calc_coef(X, y)
+    X = mylr.model1d(x, 1)
+    beta = mylr.calc_coef(X, y)
 
     # draw graph
     plt.scatter(x, y, marker="o", facecolor="None", edgecolors="red")
@@ -40,5 +22,5 @@ if __name__ == "__main__":
     # draw graph
     # TODO(label): 軸ラベルなどをつける
     x_axis = np.linspace(min(x), max(x), 100)
-    plt.plot(x_axis, expect(beta, x_axis))
+    plt.plot(x_axis, mylr.expect1d(beta, x_axis))
     plt.show()
