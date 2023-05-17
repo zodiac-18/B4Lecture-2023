@@ -74,14 +74,15 @@ def label1d(beta):
     Returns:
         string: function label
     """
-    label = ""
+    label = "y="
     for i, b in enumerate(beta):
         # type(b) -> ndarray
         # type(b[0]) -> np.float64
+        b = b[0]
         if i == 0:
-            label += f'{b[0]:.2f}'
+            label += f'{b:+.2f}'
         else:
-            label += "+" + f'{b[0]:.2f}$x^{i}$'
+            label += f'{b:+.2f}$x^{i}$'
     return label
 
 
@@ -143,7 +144,7 @@ def label2d(beta, N1, N2):
     """
     assert len(beta) == N1 + N2 + 1
 
-    label = ""
+    label = "y="
     for i in range(0, N1+1):
         b = beta[i]  # ex) [0.11]
         b = b[0]     # ex)  0.11
