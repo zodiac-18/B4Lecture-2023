@@ -60,9 +60,9 @@ jobs:
             chomeyama
             tkmyamamoto
           body: |
-            users.csv を更新しました。
+            users.csv を更新しました．
             
-            ${{ inputs.lecture }}のレビュアーを割り当てました。
+            ${{ inputs.lecture }}のレビュアーを割り当てました．
             ${{ env.NEW_ASSIGN }}
             
-            このPRをマージ後、この割り当てに基づいて自動でレビュアーが指定されます。
+            このPRをマージ後，この割り当てに基づいて自動でレビュアーが指定されます．
