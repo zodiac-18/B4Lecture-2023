@@ -65,6 +65,26 @@ def expect1d(beta, x):
     return y
 
 
+def label1d(beta):
+    """Generate label.
+
+    Args:
+        beta (np.ndarray): coefficient vector
+
+    Returns:
+        string: function label
+    """
+    label = ""
+    for i, b in enumerate(beta):
+        # type(b) -> ndarray
+        # type(b[0]) -> np.float64
+        if i == 0:
+            label += f'{b[0]:.2f}'
+        else:
+            label += "+" + f'{b[0]:.2f}$x^{i}$'
+    return label
+
+
 def model2d(x1, x2, N1, N2):
     """Generate model.
 
@@ -108,3 +128,33 @@ def expect2d(beta, N1, N2, x1_mesh, x2_mesh):
     for i in range(1, N2+1):
         y += beta[N1+i] * x2_mesh**i
     return y
+
+
+def label2d(beta, N1, N2):
+    """Generate label.
+
+    Args:
+        beta (np.ndarray): coefficient vector
+        N1 (int): dimension of x1
+        N2 (int): dimension of x2
+
+    Returns:
+        string: function label
+    """
+    assert len(beta) == N1 + N2 + 1
+
+    label = ""
+    for i in range(0, N1+1):
+        b = beta[i]  # ex) [0.11]
+        b = b[0]     # ex)  0.11
+        if i == 0:
+            label += f'{b:.2f}'
+        else:
+            label += f'{b:+.2f}$x_{1}^{i}$'
+
+    for i in range(1, N2+1):
+        b = beta[N1+i]
+        b = b[0]
+        label += f'{b:+.2f}$x_{2}^{i}$'
+
+    return label

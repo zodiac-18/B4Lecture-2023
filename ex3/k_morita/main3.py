@@ -40,7 +40,7 @@ if __name__ == "__main__":
     ax.set_zlabel("y", fontsize=22)
     ax.scatter(x1, x2, y, marker="o", c="red", label="Observed data")
     ax.plot_wireframe(
-        x1_mesh, x2_mesh, y_expect, color="blue", label="regression curve"
+        x1_mesh, x2_mesh, y_expect, color="blue", label=mylr.label2d(beta, N1, N2)
     )
     ax.legend(fontsize=15)
     plt.tick_params(labelsize=15)

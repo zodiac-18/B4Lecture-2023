@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # draw graph
     x_axis = np.linspace(min(x), max(x), 100)
     plt.scatter(x, y, facecolor="None", edgecolors="red", label="Observed")
-    plt.plot(x_axis, mylr.expect1d(beta, x_axis), label="regression curve")
+    plt.plot(x_axis, mylr.expect1d(beta, x_axis), label=mylr.label1d(beta))
     plt.title("Polynomial Linear-Regression")
     plt.xlabel("x")
     plt.ylabel("y")
