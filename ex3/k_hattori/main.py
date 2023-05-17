@@ -13,41 +13,77 @@ def load_csv(path):
 
     return array
 
-def lreg(x, y, n):
-    N = n + 1
-    if x.ndim > 1:
-        N += x.shape[1]
-    # Create a matrix of explanatory variables
-    poly_x = np.zeros([N, x.shape[0]])
-    for i in range(N):
-        poly_x[i,:] = x** i
-    poly_x = poly_x.T
+def ridge_reg(x, y, n, k):
+    if x.ndim == 1:
+        x = x.reshape(-1, len(x)).T
+    N = n * x.shape[1] + 1
 
+    # Create a matrix of explanatory variables and identity matrix
+    poly_x = np.zeros([x.shape[0], N])
+    # Power number
+    j = 0
+    # row number
+    l = 0
+    for i in range(N):
+        # Reset power number(When x has 2 or more rows)
+        if i and i % (n+1) == 0:
+            j = 1
+            l += 1
+        poly_x[:,i] = x[:,l]** j
+        j += 1
+    I = np.eye(N)
+    print(poly_x.shape)
     # Calculate a matrix of Regression coefficients beta
     tmp = np.dot(poly_x.T, poly_x)
-    tmp = np.dot(np.linalg.inv(tmp), poly_x.T)
+    tmp = np.dot(np.linalg.inv(tmp+k*I), poly_x.T)
     beta = np.dot(tmp, y)
 
     # Calculate regression results
     y_predict = 0
     for i in range(N):
-        y_predict += x** i * beta[i]
+        y_predict += poly_x[:,i] * beta[i]
+    if y_predict.ndim > 1:
+        y_result = 0
+        for i in range(y_predict.shape[1]):
+            y_result += y_predict[:,i]
+        y_result -= y_predict.shape[1] - 1
 
     return y_predict
 
 def main():
     # Load csv files
-    x1 = load_csv('ex3\data1.csv')
-    x2 = load_csv('ex3\data2.csv')
-    x3 = load_csv('ex3\data3.csv')
+    data1 = load_csv('ex3\data1.csv')
+    data2 = load_csv('ex3\data2.csv')
+    data3 = load_csv('ex3\data3.csv')
+
     # Plot data
-    plt.scatter(x1[:,0],x1[:,1])
+    x1 = data1[:,0]
+    y1 = data1[:,1]
+    plt.scatter(x1, y1)
     plt.show()
-    plt.scatter(x2[:,0],x2[:,1])
+
+    x2 = data2[:,0]
+    y2 = data2[:,1]
+    plt.scatter(x2, y2)
     plt.show()
-    fig = plt.figure(figsize=(6,4))
+
+    x3 = data3[:,0]
+    y3 = data3[:,1]
+    z3 = data3[:,2]
+    fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x3[:,0], x3[:,1], x3[:,2])
+    ax.scatter(x3, y3, z3)
+    plt.show()
+
+    y1_predict = ridge_reg(x1, y1, 1, 0)
+    plt.scatter(x1, y1)
+    plt.plot(x1, y1_predict)
+    plt.show()
+
+    z3_predict = ridge_reg(data3[:,:2], z3, 1, 0)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x3, y3, z3_predict)
     plt.show()
 
 
