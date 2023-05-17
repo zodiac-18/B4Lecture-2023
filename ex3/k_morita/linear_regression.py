@@ -17,6 +17,21 @@ def calc_coef(X, y):
     return beta
 
 
+def calc_coef_with_regularization(X, y, alpha):
+    """Calculate coefficients with regularizasion.
+
+    Args:
+        X (np.ndarray): model matrix
+        y (np.ndarray): object variable vector
+        alpha (np.float64): parameter of regular matrix
+
+    Returns:
+        np.ndarray: coefficient vector
+    """
+    beta = np.linalg.inv(X.T @ X + alpha * np.identity(X.shape[1])) @ X.T @ y
+    return beta
+
+
 def model1d(x, N):
     """Generate Model.
 
