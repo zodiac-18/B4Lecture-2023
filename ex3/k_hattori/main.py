@@ -108,7 +108,7 @@ def main():
     plt.scatter(x1, y1, color="silver", label="data1")
     plt.plot(
         x1[x1.argsort()], y1_predict[x1.argsort()],
-        color="orange", label="regression"
+        color="orange", label="linear regression"
     )
     plt.plot(
         x1[x1.argsort()],
@@ -125,7 +125,7 @@ def main():
     plt.scatter(x2, y2, color="silver", label="data2")
     plt.plot(
         x2[x2.argsort()], y2_predict[x2.argsort()],
-        color="orange", label="regression"
+        color="orange", label="linear regression"
     )
     plt.xlabel("x1")
     plt.ylabel("x2")
@@ -137,10 +137,11 @@ def main():
     ax.set_title("data3")
     ax.scatter(x3, y3, z3, color="silver", label="data3")
     ax.scatter(x3, y3, z3_predict, marker="+",
-               color="orange", label="regression")
+               color="blue", label="linear regression")
     ax.set_xlabel("x1")
     ax.set_ylabel("x2")
     ax.set_zlabel("x3")
+    plt.legend()
     plt.show()
 
 
