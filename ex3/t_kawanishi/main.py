@@ -1,4 +1,4 @@
-"Regression analysis"
+"""Regression analysis."""
 import argparse
 import csv
 import re
@@ -76,7 +76,7 @@ def lsm_3(dataset: np.ndarray, deg: int, reg=False, stren=0.005) -> np.ndarray:
 def genpoint(
     dataset: np.ndarray, function: np.ndarray, quant=10000
 ) -> tuple[np.ndarray, np.ndarray]:
-    """To generate function's data to plot
+    """To generate function's data to plot.
 
     Args:
         dataset (np.ndarray): As the name implies
@@ -139,7 +139,9 @@ def genpoint(
 if __name__ == "__main__":
     # get parser
     parser = argparse.ArgumentParser(
-        description="This program is to adapt least squares method to the dataset for regression analysis"
+        description="""This program is to adapt least
+                    squares method to the dataset for
+                    regression analysis"""
     )
     parser.add_argument("path", help="The path of dataset")
     parser.add_argument(

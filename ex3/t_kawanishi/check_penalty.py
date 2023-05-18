@@ -1,4 +1,4 @@
-"Generate graph to check relationship between penalty and graph similarity"
+"""Generate graph to check relationship between penalty and graph similarity."""
 import argparse
 import csv
 import re
@@ -20,7 +20,8 @@ def penaltyData(
         lambda_group (np.ndarray): The group of penalty group
 
     Returns:
-        np.ndarray: matrix that used for plot and should be (len(degree_group), len(lambda_group):Lambda applicable difference value)
+        np.ndarray: matrix that used for plot and should be
+        (len(degree_group), len(lambda_group):Lambda applicable difference value)
     """
     # generate error group matrix
     error_group = np.zeros((len(degree_group), len(lambda_group)))
