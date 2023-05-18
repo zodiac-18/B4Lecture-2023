@@ -6,6 +6,12 @@ import scipy
 import soundfile
 
 
+def sinc(x):
+    if x == 0:
+        return 1
+    else:
+        return np.sin(x)/x
+
 def conv(left: np.ndarray, right: np.ndarray):
     """Calculate convolution.
 
@@ -80,7 +86,28 @@ def highpass_filer(
     hpf = (np.sinc(x) - np.sinc(cut_off_fq_to_time * x) * cut_off_fq_to_time) * window(
         div_num
     )
-    return hpf
+    return np.array(hpf)
+
+def lowpass_filer(
+    div_num: int, cut_off_frequency: int, sample_rate: int, window=np.hamming
+):
+    """Make high-pass filter.
+
+    Args:
+        div_num (int): The number of the division.
+        cut_off_frequency (int): The cut-off frequency.
+        sample_rate (int): The sample rate of the sound.
+        window (numpy, optional): The setting of the window. Defaults to np.hamming.
+
+    Returns:
+        ndarray: The high-pass filter.
+    """
+    cut_off_fq_to_time = 2 * cut_off_frequency / (sample_rate)  # カットオフ周波数をsinc関数軸に変換
+    x = np.array([t for t in range(-div_num // 2, div_num // 2)])
+    hpf = []
+    for i in x:
+        hpf.append(sinc(cut_off_fq_to_time * i * np.pi) * cut_off_fq_to_time)
+    return hpf * window(div_num)
 
 
 def main():
@@ -88,7 +115,7 @@ def main():
     # 初期値の設定
     fig, ax = plt.subplots(4, 1, layout="constrained", sharex=True)
     fig2, ax2 = plt.subplots(3, 1, layout="constrained")
-    div_num = 200  # フィルターの分割数
+    div_num = 201  # フィルターの分割数
     cut_off_frequency = 5000  # 遮断周波数
 
     # 音源の読み込み、出力
@@ -115,7 +142,7 @@ def main():
     ax2[1].set_xlabel("Frequency[Hz]")
     ax2[1].set_ylabel("Angle[rad]")
     ax2[1].plot(
-        freq[: div_num // 2], np.unwrap(np.angle(hpf_fft[: div_num // 2]), period=np.pi) / np.pi
+        freq[: div_num // 2], np.unwrap(np.angle(hpf_fft[: div_num // 2]))
     )  # ハイパスフィルタの位相情報を出力
     ax2[2].set_title("Filter preview")
     ax2[2].set_xlabel("The number of the sample")
