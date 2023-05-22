@@ -115,7 +115,7 @@ def scat_plot3d(x, y, z, beta, beta_r, N1, N2):
     ax2.set_ylabel("y", fontsize=10)
     ax2.set_zlabel("z", fontsize=10)
     ax2.set_title("Multiple Linear Regression(regularization)")
-    ax2.scatter(x, y, z, marker="o", c="red", label="vOriginal data")
+    ax2.scatter(x, y, z, marker="o", c="red", label="Original data")
     ax2.plot_wireframe(
         x_mesh,
         y_mesh,
