@@ -19,10 +19,10 @@ def load_csv(path):
         reader = csv.reader(f, delimiter=",")
         buf = [row for row in reader]
     # Convert to ndarray in float64
-    array = np.array(buf[1:])
-    array = array.astype(np.float64)
+    csv_data = np.array(buf[1:])
+    csv_data = csv_data.astype(np.float64)
 
-    return array
+    return csv_data
 
 
 def ridge_reg(x, y, n, k):
@@ -157,9 +157,9 @@ def main():
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection="3d")
-    ax.set_title("data3")
+    ax.set_title("data3.csv")
     ax.scatter(x3, y3, z3, marker=".", color="blue", label="data3")
-    ax.plot_wireframe(XX, YY, ZZ, color="orange", label=str31 + str32)
+    ax.plot_wireframe(XX, YY, ZZ, color="orange", label=str31+str32)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
