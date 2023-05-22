@@ -11,18 +11,25 @@ def f0_autoco(data):
     return 0
 
 def cepstrum(data, samplerate):
+    freq = np.linspace(0, samplerate, len(data))
     fft_data = np.fft.fft(data)
-    cept_data = np.fft.fft(fft_data)
-    cept_data[150000:] = 0
+    abs_data = np.abs(fft_data[freq <= 8000])
+    log_data = np.log(abs_data)
+
+    ceps= np.fft.ifft(log_data)
 
 
-    plt.subplot(211)
-    plt.plot(fft_data)
-    plt.subplot(212)
-    plt.plot(cept_data)
+    plt.plot(np.abs(ceps))
     plt.show()
-    plt.plot(20*np.log10(np.abs(fft_data)))
-    plt.plot(20*np.log10(cept_data), "orange")
+
+    # ceps[10000:] = 0
+
+    spec_envelope = np.fft.fft(ceps)
+
+    plt.plot(ceps)
+    plt.show()
+    plt.plot(freq[freq <= 8000], log_data)
+    plt.plot(freq[freq <= 8000], np.log(np.abs(spec_envelope)),"orange")
     plt.show()
 
     return 0
@@ -30,10 +37,8 @@ def cepstrum(data, samplerate):
 def main():
     data, samplerate = mf.wavload("ex4/k_hattori/ONSEI.wav")
 
+
     cep_data = cepstrum(data, samplerate)
-    plt.plot(data)
-    plt.plot(cep_data, "orange")
-    plt.show()
 
 
 
