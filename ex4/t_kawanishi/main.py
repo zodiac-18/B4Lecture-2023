@@ -1,6 +1,7 @@
 """Fundamental frequency estimation
     and spectrum envelope."""
 import argparse
+import re
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -53,6 +54,10 @@ if __name__ == "__main__":
     ex1.show_spectrogram(data, ax1,Fs=args.f_size,overlap_r=args.overlap_r,sample_rate=s_rate,y_lim=args.y_limit)
     ex1.show_spectrogram(data, ax2,Fs=args.f_size,overlap_r=args.overlap_r,sample_rate=s_rate,y_lim=args.y_limit)
 
+    # create file name
+    name = re.sub(r".+\\","",args.path)
+    name = re.sub(r"\..+","",name)
+
     # plot f0 generate by autocorrelation Function
     dis = int(args.f_size*args.overlap_r)
     frame_l = int(len(data) // dis)*dis
@@ -64,14 +69,11 @@ if __name__ == "__main__":
     #plot f0 generate by cepstrum method
     ax2.plot(x_t,f0_g2)
     ax2.set_title("spectrum and f0 estimation with cepstrum")
-    plt.savefig("f0.png")
+    plt.savefig("f0_" + name)
 
     # spectrum envelop
     win = np.hamming(args.f_size)
     win_data = data[:args.f_size] * win
-    plt.figure()
-    plt.plot(np.arange(len(win_data)),win_data,color = "g")
-
 
     log = 20 * np.log10(np.abs(np.fft.rfft(win_data)))
     cep = f0.cep_env(win_data, lif=50)
@@ -86,6 +88,5 @@ if __name__ == "__main__":
     plt.ylabel("Log amplitude spectrum[dB]")
     plt.legend()
     plt.tight_layout()
-
-    plt.savefig("spectrum.png")
+    plt.savefig("spectrum_" + name + "_" + str(args.degree))
     plt.show()
