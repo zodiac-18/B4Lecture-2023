@@ -1,3 +1,4 @@
+"""Regression analysis using the least squares method."""
 import argparse
 
 import matplotlib.pyplot as plt
@@ -5,7 +6,7 @@ import numpy as np
 
 
 def lstsq(x, y, order: int, dimension: int, lamb: int):
-    """Least-squares method
+    """Least-squares method.
 
     Args:
         x (ndarray): Explanatory variables
@@ -32,7 +33,7 @@ def lstsq(x, y, order: int, dimension: int, lamb: int):
 
 
 def genplotdata(x, u, order, dimension):
-    """Generate plot data
+    """Generate plot data.
 
     Args:
         x (ndarray): Explanatory variables
@@ -62,8 +63,8 @@ def genplotdata(x, u, order, dimension):
     return x_re, y_re, z_re
 
 
-def genlabel(u, order, dimension):
-    """Generate label
+def generate_equation(u, order, dimension):
+    """Generate label.
 
     Args:
         u (ndarray): Regression coefficient
@@ -101,6 +102,10 @@ def genlabel(u, order, dimension):
 
 
 def main():
+    """
+    Plot a scatter plot using the data in the csv file
+    and obtain the regression equation.
+    """
     parser = argparse.ArgumentParser(
         "Regression analysis using the least squares method"
     )
@@ -141,8 +146,8 @@ def main():
     # Generate data to plot
     x_re, y_re, z_re = genplotdata(x, u, order, dimension)
     x_rre, y_rre, z_rre = genplotdata(x, u_reg, order, dimension)
-    label = genlabel(u, order, dimension)
-    label_reg = genlabel(u_reg, order, dimension)
+    label = generate_equation(u, order, dimension)
+    label_reg = generate_equation(u_reg, order, dimension)
 
     # Plot data
     plt.figure()
@@ -163,16 +168,16 @@ def main():
         ax1.set_xlabel("X", size="x-small")
         ax1.set_ylabel("Y", size="x-small")
         ax1.set_zlabel("Z", size="x-small")
-        ax1.legend(fontsize="xx-small")
+        ax1.legend(bbox_to_anchor=(1, 1.1), fontsize="xx-small")
         ax2 = plt.subplot(122, projection="3d")
         ax2.scatter(x1, x2, y, c="b", label="Observed data")
         ax2.plot_wireframe(x_rre, y_rre, z_rre, color="g", label=label_reg)
         ax2.set_xlabel("X", size="x-small")
         ax2.set_ylabel("Y", size="x-small")
         ax2.set_zlabel("Z", size="x-small")
-        ax2.legend(fontsize="xx-small")
-    # plt.show()
+        ax2.legend(bbox_to_anchor=(1, 1.1), fontsize="xx-small")
     plt.savefig(figname)
+    plt.show()
 
 
 if __name__ == "__main__":
