@@ -102,7 +102,7 @@ def generate_equation(u, order, dimension):
 
 
 def main():
-    """Main function."""
+    """Plot scatter plots and regression equations."""
     parser = argparse.ArgumentParser(
         "Regression analysis using the least squares method"
     )
