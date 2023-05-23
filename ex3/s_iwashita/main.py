@@ -1,10 +1,10 @@
 import argparse
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
-def lstsq(x, y, order:int, dimension:int, lamb:int):
+def lstsq(x, y, order: int, dimension: int, lamb: int):
     """Least-squares method
 
     Args:
@@ -18,17 +18,18 @@ def lstsq(x, y, order:int, dimension:int, lamb:int):
         u (ndarray): Regression coefficient
         u_re (ndarray): Regularized regression coefficient
     """
-    A_t = x ** order
-    for i in range(order-1, -1, -1):
-        A_t = np.vstack((A_t, x ** i))
+    A_t = x**order
+    for i in range(order - 1, -1, -1):
+        A_t = np.vstack((A_t, x**i))
     if dimension == 3:
-        A_t = np.delete(A_t, slice(-1, -dimension+1, -1), 0)
+        A_t = np.delete(A_t, slice(-1, -dimension + 1, -1), 0)
     A = A_t.T
     v = np.array(y).T
     u = np.linalg.inv(A.T @ A) @ A.T @ v
     u_reg = np.linalg.inv(A.T @ A + lamb * np.identity(A.shape[1])) @ A.T @ v
 
     return u, u_reg
+
 
 def genplotdata(x, u, order, dimension):
     """Generate plot data
@@ -45,20 +46,21 @@ def genplotdata(x, u, order, dimension):
     if dimension == 2:
         x_re = np.linspace(min(x), max(x), 100)
         y_re = np.zeros_like(x_re)
-        for i in range(order+1):
-            y_re += u[i] * x_re ** i
+        for i in range(order + 1):
+            y_re += u[i] * x_re**i
         z_re = None
-    
+
     elif dimension == 3:
         x_re = np.linspace(min(x[0]), max(x[0]), 10)
         y_re = np.linspace(min(x[1]), max(x[1]), 10)
         x_re, y_re = np.meshgrid(x_re, y_re)
         z_re = np.zeros_like(x_re)
-        z_re = u[0] * x_re ** 0
-        for i in range(1, order+1):
-            z_re += u[2*i-1] * y_re ** i + u[2*i] * x_re ** i
+        z_re = u[0] * x_re**0
+        for i in range(1, order + 1):
+            z_re += u[2 * i - 1] * y_re**i + u[2 * i] * x_re**i
 
-    return x_re, y_re, z_re    
+    return x_re, y_re, z_re
+
 
 def genlabel(u, order, dimension):
     """Generate label
@@ -79,11 +81,11 @@ def genlabel(u, order, dimension):
             if i == 1:
                 label += f"{u[i]:.2f}x"
             else:
-                label += f"{u[i]:.2f}" + "$x^{"+ str(i) +"}$"
+                label += f"{u[i]:.2f}" + "$x^{" + str(i) + "}$"
 
     elif dimension == 3:
         label = f"z={u[0]:.2f}"
-        for i in range(1, order*2 + 1):
+        for i in range(1, order * 2 + 1):
             if u[i] > 0:
                 label += "+"
             if i == 1:
@@ -91,19 +93,26 @@ def genlabel(u, order, dimension):
             elif i == 2:
                 label += f"{u[i]:.2f}x"
             elif i % 2 == 1:
-                label += f"{u[i]:.2f}" + "$y^{"+ str(i//2+1) +"}$"
+                label += f"{u[i]:.2f}" + "$y^{" + str(i // 2 + 1) + "}$"
             else:
-                label += f"{u[i]:.2f}" + "$x^{"+ str(i//2) +"}$"
-    
+                label += f"{u[i]:.2f}" + "$x^{" + str(i // 2) + "}$"
+
     return label
 
+
 def main():
-    parser = argparse.ArgumentParser("Regression analysis using the least squares method")
+    parser = argparse.ArgumentParser(
+        "Regression analysis using the least squares method"
+    )
 
     parser.add_argument("filename")
     parser.add_argument("order", type=int, help="Order of regression equation")
-    parser.add_argument("-l", "--lamb", type=int, default=10, help="Regularization factor")
-    parser.add_argument("-f", "--figname", type=str, default="sample.png", help="Name of result figure")
+    parser.add_argument(
+        "-l", "--lamb", type=int, default=10, help="Regularization factor"
+    )
+    parser.add_argument(
+        "-f", "--figname", type=str, default="sample.png", help="Figure name"
+    )
 
     args = parser.parse_args()
 
@@ -115,7 +124,7 @@ def main():
     # read csv file
     data = np.genfromtxt(filename, delimiter=",", skip_header=1)
     dimension = len(data[0])
-    
+
     # Separate data into explanatory and objective variables
     x = data[:, 0]
     y = data[:, 1]
@@ -136,7 +145,7 @@ def main():
     label_reg = genlabel(u_reg, order, dimension)
 
     # Plot data
-    fig = plt.figure()
+    plt.figure()
     if dimension == 2:
         ax = plt.subplot()
         ax.scatter(x, y, s=5, c="b", label="Observed data")
@@ -162,9 +171,8 @@ def main():
         ax2.set_ylabel("Y", size="x-small")
         ax2.set_zlabel("Z", size="x-small")
         ax2.legend(fontsize="xx-small")
-    #plt.show()
+    # plt.show()
     plt.savefig(figname)
-
 
 
 if __name__ == "__main__":
