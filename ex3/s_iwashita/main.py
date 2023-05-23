@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def lstsq(x, y, order: int, dimension: int, lamb: int):
+def least_squares_method(x, y, order: int, dimension: int, lamb: int):
     """Least-squares method.
 
     Args:
@@ -32,7 +32,7 @@ def lstsq(x, y, order: int, dimension: int, lamb: int):
     return u, u_reg
 
 
-def genplotdata(x, u, order, dimension):
+def generate_plot_data(x, u, order, dimension):
     """Generate plot data.
 
     Args:
@@ -102,9 +102,7 @@ def generate_equation(u, order, dimension):
 
 
 def main():
-    """
-    Main function.
-    """
+    """Main function."""
     parser = argparse.ArgumentParser(
         "Regression analysis using the least squares method"
     )
@@ -139,12 +137,12 @@ def main():
         y = data[:, 2]
 
     # Calculate regression coefficient
-    u, u_reg = lstsq(x, y, order, dimension, lamb)
+    u, u_reg = least_squares_method(x, y, order, dimension, lamb)
     u, u_reg = u[::-1], u_reg[::-1]
 
     # Generate data to plot
-    x_re, y_re, z_re = genplotdata(x, u, order, dimension)
-    x_rre, y_rre, z_rre = genplotdata(x, u_reg, order, dimension)
+    x_re, y_re, z_re = generate_plot_data(x, u, order, dimension)
+    x_rre, y_rre, z_rre = generate_plot_data(x, u_reg, order, dimension)
     label = generate_equation(u, order, dimension)
     label_reg = generate_equation(u_reg, order, dimension)
 
