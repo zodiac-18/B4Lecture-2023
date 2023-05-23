@@ -103,8 +103,7 @@ def generate_equation(u, order, dimension):
 
 def main():
     """
-    Plot a scatter plot using the data in the csv file
-    and obtain the regression equation.
+    Main function.
     """
     parser = argparse.ArgumentParser(
         "Regression analysis using the least squares method"
