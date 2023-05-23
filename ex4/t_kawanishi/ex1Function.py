@@ -5,25 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 
-parser = argparse.ArgumentParser(
-    description="This is a program to generate sound's spectrogram"
-)
-parser.add_argument("path", help="the path of sound")
-parser.add_argument(
-    "-s",
-    "--f_size",
-    help="frame size recommend between 128 to 2048 ",
-    default=512,
-    type=int,
-)
-parser.add_argument(
-    "-r", "--overlap_r", help="overlap rate between 0 to 1", default=0.5, type=float
-)
-parser.add_argument(
-    "-l", "--y_limit", help="limit of spectrogram's frequency", default=25000, type=int
-)
-
-
 def load_sound(sound_path: str) -> tuple[np.ndarray, int]:
     """Load sound file.
 
@@ -101,18 +82,17 @@ def istft(data: np.ndarray, overlap: float, length: int) -> np.ndarray:
 
 
 def show_spectrogram(
-    data: np.ndarray, overlap_r=0.5, Fs=512, sample_rate=48000, y_lim=20000, s_name=""
-) -> None:
+    data: np.ndarray, ax, overlap_r=0.5, Fs=512, sample_rate=48000, y_lim=20000,
+) :
     """To show spectrogram and save.
 
     Args:
         data (np.ndarray): sound signal
+        ax: matplotlib.axes._axes.Axes
         overlap_r (float, optional): overlap_rate. Defaults to 0.5.
         Fs (int, optional): frame size. Defaults to 512.
         sample_rate (int, optional): as the name implies. Defaults to 48000.
         y_lim (int, optional): spectrogram's y-axis range. Defaults to 20000.
-        s_name (str, optional): if want save the image, type a name to save
-                                Defaults will not save the image. Defaults to "".
     """
     # adapt data to short-time fourier transform
     frame_group, freq, frame_l = stft(data, overlap_r, Fs, sample_rate)
@@ -131,7 +111,6 @@ def show_spectrogram(
                 group[i][j] = x
             else:
                 group[i][j] = 20 * np.log(x)
-    fig, ax = plt.subplots(figsize=(5, 5))
     pcm = ax.pcolormesh(
         spec_t,
         freq,
@@ -152,8 +131,6 @@ def show_spectrogram(
     ax.set_ylabel("Frequency[Hz]")
     ax.set_title("Spectrogram")
     color_b.set_label("Amplitude[dB]", labelpad=-0.1)
-    if not s_name == "":
-        fig.savefig(s_name)
     return None
 
 
@@ -170,6 +147,23 @@ def extract_sound(data: np.ndarray, file_name: str, sample_rate: int) -> None:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="This is a program to generate sound's spectrogram"
+    )
+    parser.add_argument("path", help="the path of sound")
+    parser.add_argument(
+        "-s",
+        "--f_size",
+        help="frame size recommend between 128 to 2048 ",
+        default=512,
+        type=int,
+    )
+    parser.add_argument(
+        "-r", "--overlap_r", help="overlap rate between 0 to 1", default=0.5, type=float
+    )
+    parser.add_argument(
+        "-l", "--y_limit", help="limit of spectrogram's frequency", default=25000, type=int
+    )
     args = parser.parse_args()
     Fs = args.f_size
     overlap_r = args.overlap_r
