@@ -18,7 +18,7 @@ def ACF(data: np.ndarray) -> np.ndarray:
     data_d = np.concatenate([data, data])
 
     for i in range(length):
-        result[i] = data @ data_d[i: length + i]
+        result[i] = data @ data_d[i : length + i]
     return result
 
 
@@ -41,9 +41,7 @@ def peak(result: np.ndarray) -> int:
 
 
 # estimating f0 with Autocorrelation Function
-def f0_ACF(
-        data: np.ndarray, sample_rate: int,
-        size=100, overlap_r=0.5) -> np.ndarray:
+def f0_ACF(data: np.ndarray, sample_rate: int, size=100, overlap_r=0.5) -> np.ndarray:
     """To adapt autocorrelation Function for estimate f0.
 
     Args:
@@ -67,7 +65,7 @@ def f0_ACF(
         if i * dis + size > len(data):
             break
         # ACF return
-        result = ACF(data[i * dis: i * dis + size] * win)
+        result = ACF(data[i * dis : i * dis + size] * win)
 
         # peak group
         f0 = peak(result)
@@ -128,9 +126,9 @@ def f0_cep(
             break
 
         # adapt to cepstrum
-        result = cepstrum(data[i * dis: i * dis + size] * win)
+        result = cepstrum(data[i * dis : i * dis + size] * win)
 
-        f0_g[i] = peak(result[lif: (len(result) // 2)])
+        f0_g[i] = peak(result[lif : (len(result) // 2)])
     return sample_rate / (f0_g + lif)
 
 

@@ -24,8 +24,7 @@ if __name__ == "__main__":
         type=int,
     )
     parser.add_argument(
-        "-r", "--overlap_r", help="overlap rate between 0 to 1",
-        default=0.5, type=float
+        "-r", "--overlap_r", help="overlap rate between 0 to 1", default=0.5, type=float
     )
     parser.add_argument(
         "-l",
@@ -51,8 +50,7 @@ if __name__ == "__main__":
     f0_g1 = f0.f0_ACF(data, s_rate, size=args.f_size, overlap_r=args.overlap_r)
 
     # adapt to spectrum
-    f0_g2 = f0.f0_cep(data, s_rate, lif=50, size=args.f_size,
-                      overlap_r=args.overlap_r)
+    f0_g2 = f0.f0_cep(data, s_rate, lif=50, size=args.f_size, overlap_r=args.overlap_r)
 
     # create figure and sub figure
     fig = plt.figure(figsize=(15, 10))

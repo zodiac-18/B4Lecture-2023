@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 
+
 def load_sound(sound_path: str) -> tuple[np.ndarray, int]:
     """Load sound file.
 
@@ -82,8 +83,13 @@ def istft(data: np.ndarray, overlap: float, length: int) -> np.ndarray:
 
 
 def show_spectrogram(
-    data: np.ndarray, ax, overlap_r=0.5, Fs=512, sample_rate=48000, y_lim=20000,
-) :
+    data: np.ndarray,
+    ax,
+    overlap_r=0.5,
+    Fs=512,
+    sample_rate=48000,
+    y_lim=20000,
+):
     """To show spectrogram and save.
 
     Args:
@@ -162,7 +168,11 @@ if __name__ == "__main__":
         "-r", "--overlap_r", help="overlap rate between 0 to 1", default=0.5, type=float
     )
     parser.add_argument(
-        "-l", "--y_limit", help="limit of spectrogram's frequency", default=25000, type=int
+        "-l",
+        "--y_limit",
+        help="limit of spectrogram's frequency",
+        default=25000,
+        type=int,
     )
     args = parser.parse_args()
     Fs = args.f_size
