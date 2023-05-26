@@ -32,7 +32,8 @@ def STFT(data, WIDTH):
     """
     OVERLAP = int(WIDTH / 2)
     # Number of audio segments
-    split_number = len(np.arange((WIDTH / 2), data.shape[0], (WIDTH - OVERLAP)))
+    split_number = len(np.arange((WIDTH / 2),
+                                 data.shape[0], (WIDTH - OVERLAP)))
     # Size of Fourier transformed data with splited
     fframe_size = len(np.fft.fft(data[:WIDTH]))
 
@@ -42,7 +43,7 @@ def STFT(data, WIDTH):
 
     # STFT
     for i in range(split_number):
-        frame = data[pos : pos + WIDTH]
+        frame = data[pos: pos + WIDTH]
         if len(frame) >= WIDTH:
             windowed = window * frame
             # Fourier transform of segmented audio
@@ -63,8 +64,8 @@ def spectrogram(TOTAL_TIME, samplerate, data):
     Returns:
         None
     """
-    amp = np.abs(data[:, int(data.shape[1] / 2) :: -1])
-    amp = np.log(amp**2)
+    amp = np.abs(data[:, int(data.shape[1] / 2):: -1])
+    amp = 20 * np.log10(amp)
 
     plt.rcParams["image.cmap"] = "jet"
     plt.rcParams["font.family"] = "Times New Roman"
@@ -94,9 +95,9 @@ def spectrogram_double(TOTAL_TIME1, TOTAL_TIME2, samplerate, data1, data2):
     plt.rcParams["image.cmap"] = "jet"
     plt.rcParams["font.family"] = "Times New Roman"
     plt.rcParams["font.size"] = 12
-    amp1 = np.abs(data1[:, int(data1.shape[1] / 2) :: -1])
+    amp1 = np.abs(data1[:, int(data1.shape[1] / 2):: -1])
     amp1 = np.log(amp1**2)
-    amp2 = np.abs(data2[:, int(data2.shape[1] / 2) :: -1])
+    amp2 = np.abs(data2[:, int(data2.shape[1] / 2):: -1])
     amp2 = np.log(amp2**2)
 
     fig = plt.figure(figsize=(6, 6))
@@ -142,7 +143,7 @@ def convolution(x, h):
     y = np.zeros(len(x) + len(h) - 1)
     width = len(h)
     for i in range(len(x)):
-        y[i : i + width] += x[i] * h
+        y[i: i + width] += x[i] * h
 
     return y
 
@@ -169,11 +170,11 @@ def LPF_window(length, cutoff, size, samplerate):
     # Filter Design
     F_filter[freq < cutoff] = 1
     im_response = np.fft.ifft(F_filter)
-    im_response[N:-N] = 0  # Censoring of impulse response
+    im_response[N: -N] = 0  # Censoring of impulse response
     im_response = np.fft.ifftshift(im_response)
     # multiplying window function
-    windowed = window * im_response[nyq_sample - N : nyq_sample + N + 1]
-    im_response[nyq_sample - N : nyq_sample + N + 1] = windowed
+    windowed = window * im_response[nyq_sample - N: nyq_sample + N + 1]
+    im_response[nyq_sample - N: nyq_sample + N + 1] = windowed
     im_response = np.fft.fftshift(im_response)
     F_filter = np.fft.fft(im_response)
     h = np.roll(im_response, N)  # FIR filter's impulse response
