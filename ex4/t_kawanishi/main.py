@@ -1,6 +1,5 @@
 """
-Fundamental frequency estimation
-and spectrum envelope.
+Fundamental frequency estimation and spectrum envelope.
 """
 import argparse
 import re
