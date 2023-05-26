@@ -54,6 +54,7 @@ class LinearRegression:
     def fit(self, data, norm=False, lamb=0.0):
         """
         Fitting polynomials using the least squares method.
+        Store the calculated weights in the instance variable.
 
         Args:
             data (ndarray): Input data.
@@ -66,21 +67,21 @@ class LinearRegression:
         if dim == 2:
             x, y = data[0], data[1]
             phi = self.Polynominal(x)
-            eye_mat = np.eye(degree + 1)
+            I = np.eye(degree + 1)
         elif dim == 3:
             x1, x2, y = data[0], data[1], data[2]
             phi = self.Polynominal(x1, x2)
-            eye_mat = np.eye(2 * degree + 1)
+            I = np.eye(2 * degree + 1)
 
         # Apply normalization if norm is True
         if norm:
-            self.w = np.linalg.inv(phi.T @ phi + lamb * eye_mat) @ phi.T @ y
+            self.w = np.linalg.inv(phi.T @ phi + lamb * I) @ phi.T @ y
         else:
             self.w = np.linalg.inv(phi.T @ phi) @ phi.T @ y
 
     def predict(self, x1, x2=None):
         """
-        Make predictions based on the results of linear regression.
+        Make predictions based on the results of linear regression
 
         Args:
             x1 (ndarray): An array of explanatory variables.
@@ -137,7 +138,7 @@ def main():
     data = []
     with open(path, "r") as f:
         reader = csv.reader(f)
-        next(reader)
+        header = next(reader)
         for row in reader:
             data.append(list(map(float, row)))
     data = np.array(data).T
