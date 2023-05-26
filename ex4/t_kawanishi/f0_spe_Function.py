@@ -24,7 +24,7 @@ def ACF(data: np.ndarray) -> np.ndarray:
 
 # peak
 def peak(result: np.ndarray) -> int:
-    """search the peak of the input
+    """Search the peak of the input.
 
     Args:
         result (np.ndarray): input
@@ -78,7 +78,7 @@ def f0_ACF(data: np.ndarray, sample_rate: int, size=100, overlap_r=0.5) -> np.nd
 
 # cepstrum method
 def cepstrum(data: np.ndarray) -> np.ndarray:
-    """_summary_
+    """Create cepstrum.
 
     Args:
         data (np.ndarray): _description_
@@ -134,7 +134,7 @@ def f0_cep(
 
 # levinson durbin algorithm
 def levinson(r: np.ndarray, deg: int) -> tuple[np.ndarray, np.ndarray]:
-    """Levinson durbin algorithm
+    """Levinson durbin algorithm.
 
     Args:
         r (np.ndarray): autocorrelation data
@@ -159,6 +159,16 @@ def levinson(r: np.ndarray, deg: int) -> tuple[np.ndarray, np.ndarray]:
 
 # lpc method
 def lpc(data: np.ndarray, deg: int, size=100) -> np.ndarray:
+    """Lpc method.
+
+    Args:
+        data (np.ndarray): sound data
+        deg (int): degree
+        size (int, optional): size. Defaults to 100.
+
+    Returns:
+        np.ndarray: Lpc outcome
+    """
     r = ACF(data)
     a, e = levinson(r[: len(r) // 2], deg)
     w, h = scipy.signal.freqz(np.sqrt(e), a, size, "whole")
