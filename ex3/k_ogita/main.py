@@ -4,11 +4,12 @@
 """Least squares method."""
 
 import argparse
-
-import os
 import csv
-import numpy as np
+import os
+
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 class LinearRegression:
    """Linear regression model."""
