@@ -116,8 +116,7 @@ def main():
         "-n",
         "--norm",
         help="Whether to apply normalization or not",
-        default=False,
-        type=bool,
+        action="store_true",
     )
     parser.add_argument(
         "-l",
