@@ -48,7 +48,7 @@ def detect_peak(ac):
         m0 = 0
     return m0
 
-def autocorrelation(x, samplerate, overlap, framesize):
+def f_0autocor(x, samplerate, overlap, framesize):
     """
     Calculate the fundamental frequency series of the input waveform
 
@@ -102,7 +102,7 @@ def main():
     # Calculate the playback time of the input waveform
     time = len(data) / samplerate
     
-    ac = autocorrelation(data, samplerate, overlap, framesize)
+    ac = f_0autocor(data, samplerate, overlap, framesize)
 
     # Plot re-synthesized waveform
     fig, ax = plt.subplots(1, 1, figsize=(20, 10))
