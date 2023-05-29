@@ -109,9 +109,7 @@ def main():
 
     # Create a time axis
     step = int(framesize * (1 - overlap))
-    t_0 = np.arange(0, len(data)) / samplerate
     t_1 = np.arange(0, int(len(data)/step)*step, step) / samplerate
-    ax.plot(t_0, data, label="original wave")
     ax.plot(t_1, ac, label="autocorrelation")
     ax.set_title("Comparison of input wave and autocorrelation")
     ax.set_xlabel("Time[s]")
