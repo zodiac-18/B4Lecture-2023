@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Make a digital filter."""
+"""Module for cepstrum analysis."""
 
 import argparse
 
