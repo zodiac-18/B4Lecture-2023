@@ -1,9 +1,11 @@
 """Main."""
 import argparse
-import scipy.signal as signal
+
 import librosa
-import F0
+import scipy.signal as signal
+
 import envelope as env
+import F0
 
 
 def parse_args():
@@ -11,9 +13,18 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Generate spectrogram and inverse transform"
     )
-    parser.add_argument("--input-file", type=str, required=True, help="input wav file")
-    """add nfft."""
-    parser.add_argument("--nfft", type=int, default=1024, help="number of FFT points")
+    parser.add_argument(
+        "--input-file",
+        type=str,
+        required=True,
+        help="input wav file"
+    )
+    parser.add_argument(
+        "--nfft",
+        type=int,
+        default=1024,
+        help="number of FFT points"
+    )
     parser.add_argument(
         "--hop-length",
         type=int,
@@ -59,7 +70,7 @@ def main():
     # plot F0
     F0.plot_F0(data, rate, nfft, hop_length, lifter, window_func)
 
-    #plot envelope
+    # plot envelope
     env.plot_envelope(data, nfft, rate, lifter, dimension)
 
 

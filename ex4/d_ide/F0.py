@@ -1,6 +1,6 @@
 """Fundamental frequency calculation."""
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import scipy.fftpack as fftpack
 
 
@@ -17,10 +17,11 @@ def spec_cal(nfft, data, hop_length, window_func):
         ndarray: spectrogram matrix
     """
     spectrogram = np.zeros(
-        (1 + nfft // 2, (len(data) - nfft) // hop_length + 1), dtype=np.complex128
+        (1 + nfft // 2, (len(data) - nfft) // hop_length + 1),
+        dtype=np.complex128
     )
     for i in range(spectrogram.shape[1]):
-        segment = data[i * hop_length : i * hop_length + nfft] * window_func
+        segment = data[i * hop_length: i * hop_length + nfft] * window_func
         spectrum = fftpack.fft(segment, n=nfft, axis=0)[: 1 + nfft // 2]
         spectrogram[:, i] = spectrum
 
@@ -28,7 +29,7 @@ def spec_cal(nfft, data, hop_length, window_func):
 
 
 def AutoCorrelation(data):
-    """Calculation of autocorrelation function.
+    """Calculate autocorrelation function.
 
     Args:
         data (ndarray): target data
@@ -39,7 +40,10 @@ def AutoCorrelation(data):
     length = len(data)
     result = np.zeros(length)
     for m in range(length):
-        result[m] = np.dot(data[0: length - m], data[m:]) #Shift and calculate
+        result[m] = np.dot(
+            data[0: length - m],
+            data[m:]
+        )  # Shift and calculate
     return result
 
 
@@ -52,10 +56,12 @@ def detect_peak(data):
     Returns:
         int: data of ints
     """
-    peak = np.zeros(data.shape[0]-2)
-    for i in range(data.shape[0]-2):
-        if data[i] < data[i+1] and data[i+1] > data[i+2]: #Compare with previous and next values
-            peak[i] = data[i+1]
+    peak = np.zeros(data.shape[0] - 2)
+    for i in range(data.shape[0] - 2):
+        if (
+            data[i] < data[i + 1] and data[i + 1] > data[i + 2]
+        ):  # Compare with previous and next values
+            peak[i] = data[i + 1]
     max_i = np.argmax(peak)
     return max_i
 
@@ -80,7 +86,7 @@ def calc_AC(data, fs, nfft, hop_length, win):
         shift_data = data[t * hop_length: t * hop_length + nfft] * win
         r = AutoCorrelation(shift_data)
         max_i = detect_peak(r)
-        if max_i == 0: #Eliminates the first fundamental frequency
+        if max_i == 0:  # Eliminates the first fundamental frequency
             f0_ac[t] = 0
         else:
             f0_ac[t] = fs / max_i
@@ -98,7 +104,9 @@ def cepstrum(data):
         ndarray: quefrency
     """
     cr_fft = np.abs(np.fft.rfft(data))
-    cr_fft_log = np.log10(cr_fft + np.finfo(float).eps)  # Add small values to avoid zero
+    cr_fft_log = np.log10(
+        cr_fft + np.finfo(float).eps
+    )  # Add small values to avoid zero
     cr_ifft = np.fft.irfft(cr_fft_log).real
     return cr_ifft
 
@@ -116,16 +124,16 @@ def f0_cepstrum(data, fs, hop_length, nfft, lifter):
     Returns:
         ndarray: Array of fundamental frequencies
     """
-    n_shift = (len(data)-nfft)//hop_length
+    n_shift = (len(data) - nfft) // hop_length
     f0_ceps = np.empty(n_shift)
     for i in range(n_shift):
-        audio = data[i*hop_length:i*hop_length+nfft]*np.hamming(nfft)
+        audio = data[i * hop_length: i * hop_length + nfft] * np.hamming(nfft)
         ceps = cepstrum(audio)
         max_i = detect_peak(ceps[lifter:])
         if max_i == 0:
             f0_ceps[i] = 0
         else:
-            f0_ceps[i] = fs/(max_i+lifter)
+            f0_ceps[i] = fs / (max_i + lifter)
 
     return f0_ceps
 
@@ -163,15 +171,14 @@ def plot_F0(data, rate, nfft, hop_length, lifter, win):
         origin="lower",
         cmap=plt.cm.jet,
         aspect="auto",
-        extent=[0, t, 0, rate//2]
-        )
+        extent=[0, t, 0, rate // 2],
+    )
     ax1.set_xlabel("Time [s]")
     ax1.set_ylabel("Frequency [Hz]")
     fig.colorbar(im, ax=ax1)
-    ax1.plot(x1_lim, f0,
-            label="f0(auto-correlation)", color="black")
+    ax1.plot(x1_lim, f0, label="f0(auto-correlation)", color="black")
     ax1.legend()
-    plt.savefig('F0(auto-correlation)')
+    plt.savefig("F0(auto-correlation)")
     plt.tight_layout()
     plt.show()
 
@@ -183,14 +190,13 @@ def plot_F0(data, rate, nfft, hop_length, lifter, win):
         origin="lower",
         cmap=plt.cm.jet,
         aspect="auto",
-        extent=[0, t, 0, rate//2]
-        )
+        extent=[0, t, 0, rate // 2],
+    )
     ax2.set_xlabel("Time [s]")
     ax2.set_ylabel("Frequency [Hz]")
     fig.colorbar(im, ax=ax2)
-    ax2.plot(x2_lim, f0_ceps,
-            label="f0(cepstrum)", color="black")
+    ax2.plot(x2_lim, f0_ceps, label="f0(cepstrum)", color="black")
     ax2.legend()
-    plt.savefig('F0(cepstrum)')
+    plt.savefig("F0(cepstrum)")
     plt.tight_layout()
     plt.show()
