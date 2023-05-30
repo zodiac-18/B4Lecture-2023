@@ -39,13 +39,15 @@ def AutoCorrelation(data):
     Returns:
         ndarray: Result of autocorrelation
     """
-    Correlation = []
+    Correlation = np.zeros(len(data))
+
     for i in range(len(data)):
         if i == 0:
-            Correlation.append(np.sum(data * data))
+            Correlation[i] = (np.sum(data * data))
         else:
-            Correlation.append(np.sum(data[0:-i] * data[i:]))
-    return np.array(Correlation)
+            Correlation[i] = np.sum(data[0:-i] * data[i:])
+
+    return Correlation
 
 
 def Correlation_f0predict(data, interval_time, samplerate):

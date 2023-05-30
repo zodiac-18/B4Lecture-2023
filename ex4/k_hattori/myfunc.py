@@ -64,16 +64,17 @@ def spectrogram(TOTAL_TIME, samplerate, data):
     Returns:
         None
     """
-    amp = np.abs(data[:, int(data.shape[1] / 2):: -1])
+    freq = np.linspace(0, samplerate / 2, data.shape[1] // 2)
+    amp = np.abs(data[:, data.shape[1] // 2 - 1:: -1])
     amp = 20 * np.log10(amp)
 
     plt.rcParams["image.cmap"] = "jet"
     plt.rcParams["font.family"] = "Times New Roman"
     plt.rcParams["font.size"] = 12
-    plt.imshow(amp.T, extent=[0, TOTAL_TIME, 0, samplerate / 2], aspect="auto")
+    plt.imshow(amp.T[freq<=8000, :], extent=[0, TOTAL_TIME, 0, 8000], aspect="auto")
     plt.colorbar()
     plt.xlim(0, TOTAL_TIME)
-    plt.ylim(0, samplerate / 2)
+    plt.ylim(0, 8000)
     plt.ylabel("Frequency [Hz]")
     plt.xlabel("Time [s]")
     plt.show()
