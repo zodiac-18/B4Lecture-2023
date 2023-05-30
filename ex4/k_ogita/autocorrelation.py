@@ -53,7 +53,7 @@ def detect_peak(ac):
 
 def f_0autocor(x, samplerate, overlap, framesize):
     """
-    Calculate the fundamental frequency series of the input waveform
+    Calculate the fundamental frequency series of the input waveform.
 
     Args:
         x (ndarray): Input wave.
