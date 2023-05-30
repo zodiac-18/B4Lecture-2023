@@ -64,7 +64,7 @@ def main():
         "-f", "--framesize", help="the size of window", default=512, type=int
     )
     parser.add_argument(
-        "-p", help="the number of taps of lifter", default=51, type=int
+        "-p", help="the degree for lpc", default=51, type=int
     )
     parser.add_argument("path", help="the path to the audio file")
     args = parser.parse_args()
