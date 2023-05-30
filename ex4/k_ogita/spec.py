@@ -85,7 +85,20 @@ def spectrogram_to_db(spec, framesize):
     """
     return 20 * np.log10(np.abs(spec[:, : framesize // 2 + 1]))
 
+
 def draw_spectrogram(data, ax, framesize, time, y_limit, overlap, samplerate):
+    """
+    Draw spectrogram of the data.
+
+    Args:
+        data (ndarray): Input data.
+        ax (matplotlib.axes._axes.Axes): Axes.
+        framesize (int): Framesize of the window.
+        time (int): The length of the input data.(sec)
+        y_limit (int): The upper limit of y-axis.
+        overlap (float): Overlap rate.
+        samplerate (int): Samplerate of the input data.
+    """
     spectrogram = stft(data, framesize, overlap)
     spectrogram_amp = 20 * np.log10(np.abs(spectrogram[:, : int(framesize // 2 + 1)]))
     im = ax.imshow(
@@ -96,12 +109,13 @@ def draw_spectrogram(data, ax, framesize, time, y_limit, overlap, samplerate):
     )
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="3%", pad=0.05)
-    ax.set_ylim(0, min(samplerate//2, y_limit))
+    ax.set_ylim(0, min(samplerate // 2, y_limit))
     ax.set_xlabel("Time[s]")
     ax.set_ylabel("Frequency[Hz]")
     ax.set_title("Spectrogram")
     plt.colorbar(im, ax=ax, format="%+2.f dB", cax=cax)
     return None
+
 
 def main():
     """Create a spectrogram from the waveform."""

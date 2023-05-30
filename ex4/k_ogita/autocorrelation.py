@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 
+
 def calc_ac(x, N):
     """
     Calculate the autocorrelation of the frame.
@@ -23,10 +24,11 @@ def calc_ac(x, N):
     ac = []
     for i in range(N):
         if i == 0:
-            ac.append(np.sum(x*x))
+            ac.append(np.sum(x * x))
         else:
-            ac.append(np.sum(x[0:-i]*x[i:]))
+            ac.append(np.sum(x[0:-i] * x[i:]))
     return np.array(ac)
+
 
 def detect_peak(ac):
     """
@@ -38,15 +40,16 @@ def detect_peak(ac):
     Returns:
         ndarray: List of the index which have peak and its value.
     """
-    peak = np.zeros(len(ac)-1)
-    for i in range(len(ac)-2):
-        if ac[i] < ac[i+1] and ac[i+1] > ac[i+2]:
-            peak[i+1] = ac[i+1]
+    peak = np.zeros(len(ac) - 1)
+    for i in range(len(ac) - 2):
+        if ac[i] < ac[i + 1] and ac[i + 1] > ac[i + 2]:
+            peak[i + 1] = ac[i + 1]
     if len(peak) != 0:
         m0 = np.argmax(peak)
     else:
         m0 = 0
     return m0
+
 
 def f_0autocor(x, samplerate, overlap, framesize):
     """
@@ -55,24 +58,27 @@ def f_0autocor(x, samplerate, overlap, framesize):
     Args:
         x (ndarray): Input wave.
         samplerate (int): Samplerate of input wave.
+        overlap (float): Overlap rate.
         framesize (int): Window size.
 
     Returns:
-        ndarray: Autocorrelation of the input wave.
+        ndarray: Estimated f0 series.
     """
-    # Calculate the number of times to do windowing
     N = len(x)
     step = int(framesize * (1 - overlap))
+    # Calculate the number of times to do windowing
     split_time = int(N / step)
     window = np.hamming(framesize)
     f0_series = []
-    # Apply FFT to windowed frames
     for t in range(split_time):
         if t * step + framesize > N:
-            x = np.append(x, np.zeros(t*step+framesize-N))
-        frame = x[t * step: t * step + framesize]
+            x = np.append(x, np.zeros(t * step + framesize - N))
+        frame = x[t * step : t * step + framesize]
+        # Calculate autocorrelation of the frame.
         ac = calc_ac(frame * window, framesize)
+        # Detect peaks from autocorrelation list.
         peak = detect_peak(ac)
+        # Calculate estimated f0 frequency.
         if peak == 0:
             f0_frequency = 0
         else:
@@ -80,11 +86,10 @@ def f_0autocor(x, samplerate, overlap, framesize):
         f0_series.append(f0_frequency)
     return np.array(f0_series)
 
+
 def main():
     """Estimate f0 frequency."""
-    parser = argparse.ArgumentParser(
-        description="This program estimates f0 frequency."
-    )
+    parser = argparse.ArgumentParser(description="This program estimates f0 frequency.")
     parser.add_argument(
         "-f", "--framesize", help="the size of window", default=128, type=int
     )
@@ -99,9 +104,7 @@ def main():
     overlap = args.overlap
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
-    # Calculate the playback time of the input waveform
-    time = len(data) / samplerate
-    
+
     ac = f_0autocor(data, samplerate, overlap, framesize)
 
     # Plot re-synthesized waveform
@@ -109,12 +112,13 @@ def main():
 
     # Create a time axis
     step = int(framesize * (1 - overlap))
-    t_1 = np.arange(0, int(len(data)/step)*step, step) / samplerate
-    ax.plot(t_1, ac, label="autocorrelation")
+    t = np.arange(0, int(len(data) / step) * step, step) / samplerate
+    ax.plot(t, ac, label="autocorrelation")
     ax.set_title("Comparison of input wave and autocorrelation")
     ax.set_xlabel("Time[s]")
     ax.set_ylabel("Magnitude")
     ax.legend(loc=0)
+    fig.savefig("f0series_auto.png")
     plt.tight_layout()
     plt.show()
     plt.close()

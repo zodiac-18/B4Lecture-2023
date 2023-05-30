@@ -8,7 +8,6 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import autocorrelation as auto
 
@@ -21,12 +20,13 @@ def cepstrum(x):
         x (ndarray): Input wave.
 
     Returns:
-        ndarray: Cepstrum of the input wave.
+        ndarray: Cepstrum of the x.
     """
     spec = np.fft.rfft(x)
     log_power_spec = np.log10(spec)
     cep = np.real(np.fft.irfft(log_power_spec))
     return cep
+
 
 def cep_specenv(x, tap):
     """
@@ -40,10 +40,13 @@ def cep_specenv(x, tap):
         ndarray: Spectrum envelope of the input wave.
     """
     cep = cepstrum(x)
+    # Extract lower-order cepstrum.
     cep[tap:-tap] = 0
     low_cep = cep
+    # Calculate spectrum envelope.
     spec_env = 20 * np.real(np.fft.rfft(low_cep))
     return spec_env
+
 
 def f_0cep(x, tap, overlap, framesize, samplerate):
     """
@@ -58,16 +61,21 @@ def f_0cep(x, tap, overlap, framesize, samplerate):
     """
     N = len(x)
     step = int(framesize * (1 - overlap))
+    # Calculate the number of times to do windowing
     split_time = int(N / step)
     window = np.hamming(framesize)
     f0_series = []
     for t in range(split_time):
         if t * step + framesize > N:
-            x = np.append(x, np.zeros(t*step+framesize-N))
-        frame = x[t * step: t * step + framesize]
+            x = np.append(x, np.zeros(t * step + framesize - N))
+        frame = x[t * step : t * step + framesize]
+        # Calculate cepstrum of windowed frame.
         cep = cepstrum(frame * window)
-        high_cep = cep[tap:len(cep)//2]
+        # Extract higher-order cepstrum.
+        high_cep = cep[tap : len(cep) // 2]
+        # Detect peak from higher-order cepstrum.
         peak = auto.detect_peak(high_cep)
+        # Calculate estimated f0 frequency.
         if peak == 0:
             f0_frequency = 0
         else:
@@ -75,11 +83,10 @@ def f_0cep(x, tap, overlap, framesize, samplerate):
         f0_series.append(f0_frequency)
     return np.array(f0_series)
 
+
 def main():
     """Estimate f0 frequency."""
-    parser = argparse.ArgumentParser(
-        description="This program estimates f0 frequency."
-    )
+    parser = argparse.ArgumentParser(description="This program estimates f0 frequency.")
     parser.add_argument(
         "-f", "--framesize", help="the size of window", default=128, type=int
     )
@@ -98,27 +105,25 @@ def main():
     tap = args.tap
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
-    # Calculate the playback time of the input waveform
-    time = len(data) / samplerate
-    
+
     ac = f_0cep(data, tap, overlap, framesize, samplerate)
 
     # Plot re-synthesized waveform
-    fig1, ax1 = plt.subplots(1, 1, figsize=(20, 10))
+    _, ax1 = plt.subplots(1, 1, figsize=(20, 10))
 
     # Create a time axis
     step = int(framesize * (1 - overlap))
     t_0 = np.arange(0, len(data)) / samplerate
-    t_1 = np.arange(0, int(len(data)/step)*step, step) / samplerate
+    t_1 = np.arange(0, int(len(data) / step) * step, step) / samplerate
     ax1.plot(t_0, data, label="original wave")
     ax1.plot(t_1, ac, label="autocorrelation")
     ax1.set_title("Comparison of input wave and autocorrelation")
     ax1.set_xlabel("Time[s]")
     ax1.set_ylabel("Magnitude")
     ax1.legend(loc=0)
-    
+
     framesize = 512
-    fig2, ax2 = plt.subplots(1, 1, figsize=(20, 10))
+    _, ax2 = plt.subplots(1, 1, figsize=(20, 10))
     freq = np.fft.rfftfreq(framesize)
     window = np.hamming(framesize)
     data_windowed = data[:framesize] * window
@@ -126,7 +131,7 @@ def main():
     cep_env = cep_specenv(data_windowed, tap=51)
     print(cep_env)
     ax2.plot(freq, log, label="Spectrum")
-    ax2.plot(freq, cep_env[:len(log)], label="Cepstrum")
+    ax2.plot(freq, cep_env[: len(log)], label="Cepstrum")
     ax2.set_title("Spectrum envelope")
     ax2.set_xlabel("Frequency[Hz]")
     ax2.set_ylabel("Amplitude[dB]")
