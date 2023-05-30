@@ -116,8 +116,8 @@ def plot_envelope(data, nfft, fs, lifter, dimension):
         lpc_data[: nfft // 2],
         label="LPC"
     )
-    plt.xlabel("Frequency")
-    plt.ylabel("Amplitude")
+    plt.xlabel("Frequency [Hz]")
+    plt.ylabel("Amplitude [db]")
     plt.savefig("envelope")
     plt.legend()
     plt.show()

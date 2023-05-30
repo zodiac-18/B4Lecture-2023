@@ -1,7 +1,7 @@
 """Fundamental frequency calculation."""
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy.fftpack as fftpack
+import scipy.fft as fft
 
 
 def spec_cal(nfft, data, hop_length, window_func):
@@ -22,7 +22,7 @@ def spec_cal(nfft, data, hop_length, window_func):
     )
     for i in range(spectrogram.shape[1]):
         segment = data[i * hop_length: i * hop_length + nfft] * window_func
-        spectrum = fftpack.fft(segment, n=nfft, axis=0)[: 1 + nfft // 2]
+        spectrum = fft.fft(segment, n=nfft, axis=0)[: 1 + nfft // 2]
         spectrogram[:, i] = spectrum
 
     return spectrogram
@@ -175,12 +175,14 @@ def plot_F0(data, rate, nfft, hop_length, lifter, win):
     )
     ax1.set_xlabel("Time [s]")
     ax1.set_ylabel("Frequency [Hz]")
-    fig.colorbar(im, ax=ax1)
+    fig.colorbar(im, ax=ax1, format='%+2.0f dB')
     ax1.plot(x1_lim, f0, label="f0(auto-correlation)", color="black")
     ax1.legend()
     plt.savefig("F0(auto-correlation)")
     plt.tight_layout()
     plt.show()
+    plt.clf()
+    plt.close()
 
     fig = plt.figure()
     ax2 = fig.add_subplot(111)
@@ -194,7 +196,7 @@ def plot_F0(data, rate, nfft, hop_length, lifter, win):
     )
     ax2.set_xlabel("Time [s]")
     ax2.set_ylabel("Frequency [Hz]")
-    fig.colorbar(im, ax=ax2)
+    fig.colorbar(im, ax=ax2, format='%+2.0f dB')
     ax2.plot(x2_lim, f0_ceps, label="f0(cepstrum)", color="black")
     ax2.legend()
     plt.savefig("F0(cepstrum)")
