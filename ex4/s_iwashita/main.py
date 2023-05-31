@@ -1,4 +1,4 @@
-"Estimate fundamental frequency and spectral envelope."
+"""Estimate fundamental frequency and spectral envelope."""
 import argparse
 
 import librosa
@@ -9,7 +9,7 @@ import soundfile as sf
 
 
 def loadfile(filename):
-    """load sound file
+    """Load sound file.
     Args:
         filename (str): file name
     Returns:
@@ -89,7 +89,7 @@ def cepstrum(data):
 
 
 def short_time_cepstrum(data, framesize: int = 512, overlap: int = 256):
-    """Calculate short time cepstrum
+    """Calculate short time cepstrum.
 
     Args:
         data (ndarray): Input data
@@ -179,7 +179,7 @@ def envelope_cepstrum(data):
 
 
 def envelope_lpc(data, p, sr):
-    """Calculate spectrum envelope by LPC
+    """Calculate spectrum envelope by LPC.
 
     Args:
         data (ndarray): Input data
@@ -224,6 +224,7 @@ def levinson_durbin(data, dimension):
 
 
 def main():
+    """Plot f0 and the cepstrum envelope."""
     parser = argparse.ArgumentParser(
         description="""Estimation of fundamental frequency
         and calculation of spectral envelope"""
