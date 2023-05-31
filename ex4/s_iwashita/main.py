@@ -10,7 +10,7 @@ import soundfile as sf
 
 def loadfile(filename):
     """Load sound file.
-    
+
     Args:
         filename (str): file name
     Returns:
