@@ -292,8 +292,8 @@ def main():
     ax2.plot(f, log_spectrum_[: frame_size // 2], label="Spectrum")
     ax2.plot(f, envelope_cepstrum_[: frame_size // 2], label="Cepstrum")
     ax2.plot(f, envelope_lpc_[: frame_size // 2], label="LPC")
-    ax2.set_ylabel("Log amplitude spectrum [dB]]")
-    ax2.set_xlabel("Frequency [Hz]]")
+    ax2.set_ylabel("Log amplitude spectrum [dB]")
+    ax2.set_xlabel("Frequency [Hz]")
     ax2.legend()
 
     # plt.show()
