@@ -23,7 +23,7 @@ def k_means(data, k):
         distance = np.linalg.norm(data[i] - centroids)
 
 
-    
+
 
 
 def main():
