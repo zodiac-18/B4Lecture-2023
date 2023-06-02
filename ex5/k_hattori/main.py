@@ -66,6 +66,7 @@ def k_means_2d(data, k):
     # Initialization of centroids
     rand_index = random.sample(range(data.shape[0]), k)
     centroids = data[rand_index]
+    init_centroid = centroids.copy()
     # Compute centroids until error converges.
     min_e = 0.03
     count = 0
@@ -83,6 +84,11 @@ def k_means_2d(data, k):
     label = clustering_2d(data, k, centroids)
     for i in range(k):
         plt.scatter(data[label == i, 0], data[label == i, 1])
+    plt.scatter(init_centroid[:,0], init_centroid[:,1], marker="x",
+                color="red", label="Initial centorid")
+    plt.scatter(centroids[:,0], centroids[:, 1], marker="o",
+                color="red", label="Calculated centorids")
+    plt.legend()
     plt.show()
 
     return label
@@ -124,6 +130,7 @@ def k_means_3d(data, k):
     # Initialization of centroids
     rand_index = random.sample(range(data.shape[0]), k)
     centroids = data[rand_index]
+    init_centroid = centroids.copy()
     # Compute centroids until error converges.
     min_e = 0.03
     count = 0
@@ -145,6 +152,11 @@ def k_means_3d(data, k):
     for i in range(k):
         ax.scatter(data[label == i, 0], data[label == i, 1],
                    data[label == i, 2])
+    ax.scatter(init_centroid[:,0], init_centroid[:,1], init_centroid[:,2],
+               marker="x", color="red", label="Initial centorid")
+    ax.scatter(centroids[:,0], centroids[:,1], centroids[:,2],
+               marker="o", color="red", label="Calculated centorids")
+    plt.legend()
     plt.show()
 
     return label
