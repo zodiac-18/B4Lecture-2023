@@ -202,7 +202,7 @@ def melFilterBank(channel, size, samplerate):
     centers_index = np.round(centers_freq / delta_f)
     # Index of the start and stop position of each filter
     index_start = np.hstack(([0], centers_index[0: channel - 1]))
-    index_stop = np.hstack((centers_index[0:channel], [nmax]))
+    index_stop = np.hstack((centers_index[1:channel], [nmax]))
     # create melfilterbank
     filterbank = np.zeros([channel, nmax])
     for i in range(0, channel):
