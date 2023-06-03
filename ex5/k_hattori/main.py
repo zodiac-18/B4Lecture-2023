@@ -30,7 +30,7 @@ def load_csv(path):
     return array
 
 
-def clustering_2d(data, k, centroids):
+def clustering_2d(data, centroids):
     """
     Clustering data using centroids for 2D.
 
@@ -72,7 +72,7 @@ def k_means_2d(data, k):
     count = 0
     error = 1000
     while error > min_e and count < 1000:
-        label = clustering_2d(data, k, centroids)
+        label = clustering_2d(data, centroids)
         previous_cent = centroids.copy()
         for i in range(k):
             centroids[i, 0] = np.mean(data[label == i, 0])
@@ -81,7 +81,9 @@ def k_means_2d(data, k):
         error = difference[np.argmax(difference)]
         count += 1
     # Reclassify and plot vectors
-    label = clustering_2d(data, k, centroids)
+    label = clustering_2d(data, centroids)
+    cm = plt.get_cmap("Pastel1").colors
+    plt.rcParams["axes.prop_cycle"] = plt.cycler("color", cm)
     for i in range(k):
         plt.scatter(data[label == i, 0], data[label == i, 1])
     plt.scatter(init_centroid[:, 0], init_centroid[:, 1], marker="x",
@@ -94,7 +96,7 @@ def k_means_2d(data, k):
     return label
 
 
-def clustering_3d(data, k, centroids):
+def clustering_3d(data, centroids):
     """
     Clustering data using centroids for 3D.
 
@@ -136,7 +138,7 @@ def k_means_3d(data, k):
     count = 0
     error = 1000
     while error > min_e and count < 1000:
-        label = clustering_3d(data, k, centroids)
+        label = clustering_3d(data, centroids)
         previous_cent = centroids.copy()
         for i in range(k):
             centroids[i, 0] = np.mean(data[label == i, 0])
@@ -146,7 +148,8 @@ def k_means_3d(data, k):
         error = difference[np.argmax(difference)]
         count += 1
     # Reclassify and plot vectors
-    label = clustering_3d(data, k, centroids)
+    cm = plt.get_cmap("Pastel1").colors
+    plt.rcParams["axes.prop_cycle"] = plt.cycler("color", cm)
     fig = plt.figure()
     ax = fig.add_subplot(projection="3d")
     for i in range(k):
@@ -303,7 +306,7 @@ def MFCC_plot(data, mfcc, d_mfcc, dd_mfcc, TOTAL_TIME, samplerate):
     plt.figure(figsize=[8, 8])
 
     plt.subplot(411)
-    plt.title("Spectrogram")
+    plt.title("Spectrogram [dB]")
     plt.imshow(amp.T[freq <= 8000, :],
                extent=[0, TOTAL_TIME, 0, 8000], aspect="auto")
     plt.colorbar()
@@ -312,29 +315,29 @@ def MFCC_plot(data, mfcc, d_mfcc, dd_mfcc, TOTAL_TIME, samplerate):
     plt.ylabel("Frequency [Hz]")
 
     plt.subplot(412)
-    plt.title("MFCC sequence")
+    plt.title("MFCC sequence []")
     plt.imshow(mfcc.T[::-1], extent=[0, TOTAL_TIME, 0, 12], aspect="auto")
     plt.colorbar()
     plt.xlim(0, TOTAL_TIME)
     plt.ylim(0, 12)
-    plt.ylabel("MFCC")
+    plt.ylabel("Order of coefficients")
 
     plt.subplot(413)
-    plt.title("ΔMFCC sequence")
+    plt.title("ΔMFCC sequence []")
     plt.imshow(d_mfcc.T[::-1], extent=[0, TOTAL_TIME, 0, 12], aspect="auto")
     plt.colorbar()
     plt.xlim(0, TOTAL_TIME)
     plt.ylim(0, 12)
-    plt.ylabel("ΔMFCC")
+    plt.ylabel("Order of coefficients")
 
     plt.subplot(414)
-    plt.title("ΔΔMFCC sequence")
+    plt.title("ΔΔMFCC sequence []")
     plt.imshow(dd_mfcc.T[::-1], extent=[0, TOTAL_TIME, 0, 12], aspect="auto")
     plt.colorbar()
     plt.xlim(0, TOTAL_TIME)
     plt.ylim(0, 12)
     plt.xlabel("Time [s]")
-    plt.ylabel("ΔΔMFCC")
+    plt.ylabel("Order of coefficients")
 
     plt.tight_layout()
     plt.show()
