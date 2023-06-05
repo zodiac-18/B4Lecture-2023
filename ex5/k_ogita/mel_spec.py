@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Module for cepstrum analysis."""
+"""Calculate MFCC."""
 
 import argparse
 
@@ -14,27 +14,68 @@ import spec as s
 
 
 class MelFilterBank:
+    """Calculate MFCC."""
+
     def __init__(self, fs, f0, degree, framesize, overlap):
+        """
+        Initialize instance variables.
+
+        Args:
+            fs (int): Samplerate of the input data.
+            f0 (int): Frequency parameters in the mel filter bank.
+            degree (int): The number of degrees to compress the frequency domain
+            framesize (int): Window size.
+            overlap (float): Overlap rate.
+        """
         self.fs = fs
         self.f0 = f0
         self.degree = degree
         self.framesize = framesize
         self.overlap = overlap
         self.filterbank = None
-        self.f_centers = None
 
     def calc_mo(self):
+        """
+        Calculate m0.
+
+        Returns:
+            float: The value of m0.
+        """
         return 1000 * 1 / np.log10(1000 / self.f0 + 1.0)
 
     def hz2mel(self, f):
+        """
+        Convert values in Hz to mel units.
+
+        Args:
+            f (ndarray): Frequency in Hz.
+
+        Returns:
+            ndarray: Frequency in mel.
+        """
         m0 = self.calc_mo()
         return m0 * np.log10(f / self.f0 + 1.0)
 
     def mel2hz(self, m):
+        """
+        Convert values in mel to Hz units
+
+        Args:
+            m (ndarray): Frequency in mel.
+
+        Returns:
+            ndarray: Frequency in Hz.
+        """
         m0 = self.calc_mo()
         return self.f0 * (np.power(10, m / m0) - 1.0)
 
     def melfilterbank(self):
+        """
+        Create mel filter bank.
+
+        Returns:
+            ndarray : Mel filter bank.
+        """
         fmax = self.fs // 2
         melmax = self.hz2mel(fmax)
         nummax = self.framesize // 2
@@ -53,10 +94,20 @@ class MelFilterBank:
                 filterbank[m - 1, k] = (k - bin[m - 1]) / (bin[m] - bin[m - 1])
             for k in range(bank_center, bank_finish):
                 filterbank[m - 1, k] = (bin[m + 1] - k) / (bin[m + 1] - bin[m])
-        self.filterbank, self.f_centers = filterbank, f_centers
-        return filterbank, f_centers
+        self.filterbank = filterbank
+        return filterbank
 
     def calc_mfcc(self, data, ncepstrum):
+        """
+        Calculate MFCC.
+
+        Args:
+            data (ndarray): Input data.
+            ncepstrum (int): Number of cepstrums to be extracted.
+
+        Returns:
+            ndarray: MFCC.
+        """
         N = len(data)
         emp_data = pre_emphasis(data, p=0.97)
         step = int(self.framesize * (1 - self.overlap))
@@ -79,6 +130,16 @@ class MelFilterBank:
         return mfcc
 
     def delta(self, mfcc, l=2):
+        """
+        Compute ΔMFCC.
+
+        Args:
+            mfcc (ndarray): MFCC.
+            l (int, optional): Number of frames between which the difference is taken. Defaults to 2.
+
+        Returns:
+            ndarray: ΔMFCC.
+        """
         mfcc_pad = np.pad(mfcc, [(0, 0), (l, l + 1)], "edge")
         k_square = np.sum(np.power(np.arange(-l, l + 1), 2))
         k_sequence = np.arange(-l, l + 1)
@@ -90,6 +151,16 @@ class MelFilterBank:
 
 
 def pre_emphasis(data, p=0.97):
+    """
+    Pre-emphasis the data.
+
+    Args:
+        data (ndarray): Input data.
+        p (float, optional): Pre-emphasis filter coefficience. Defaults to 0.97.
+
+    Returns:
+        ndarray: Pre-emphasised data.
+    """
     N = len(data)
     pre_data = np.zeros(N)
     for i in range(1, N):
@@ -98,7 +169,7 @@ def pre_emphasis(data, p=0.97):
 
 
 def main():
-    """Estimate f0 frequency."""
+    """Calculate MFCC, ΔMFCC, ΔΔMFCC."""
     parser = argparse.ArgumentParser(description="This program estimates f0 frequency.")
     parser.add_argument(
         "-f", "--framesize", help="the size of window", default=512, type=int

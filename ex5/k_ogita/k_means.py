@@ -13,12 +13,27 @@ import numpy as np
 
 
 class KMeans:
+    """KMeans clastering."""
+
     def __init__(self, cluster_n, dim=2):
+        """
+        Initialize instance variable.
+
+        Args:
+            cluster_n (int): The number of cluster.
+            dim (int, optional): Dimension of the data. Defaults to 2.
+        """
         self.cluster_n = cluster_n
         self.labels = None
         self.centroids = np.zeros((cluster_n, dim))
 
     def fit(self, data):
+        """
+        Fitting to data using the k-means method.
+
+        Args:
+            data (ndarray): Input data.
+        """
         N = data.shape[0]
         cluster_n = self.cluster_n
         # 1. Assign labels to data randomly
@@ -43,6 +58,15 @@ class KMeans:
                 )
 
     def predict(self, data):
+        """
+        Predicting data based on fitting.
+
+        Args:
+            data (ndarray): Input data.
+
+        Returns:
+            ndarray: Label prediction results.
+        """
         N = data.shape[0]
         labels = np.zeros(N)
         for i in range(N):
