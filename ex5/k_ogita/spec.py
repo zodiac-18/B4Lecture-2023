@@ -86,7 +86,9 @@ def spectrogram_to_db(spec, framesize):
     return 20 * np.log10(np.abs(spec[:, : framesize // 2 + 1]))
 
 
-def draw_spectrogram(data, ax, framesize, time, y_limit, overlap, samplerate, is_spec=False):
+def draw_spectrogram(
+    data, ax, framesize, time, y_limit, overlap, samplerate, is_spec=False
+):
     """
     Draw spectrogram of the data.
 
@@ -101,7 +103,9 @@ def draw_spectrogram(data, ax, framesize, time, y_limit, overlap, samplerate, is
     """
     if not is_spec:
         spectrogram = stft(data, framesize, overlap)
-        spectrogram_amp = 20 * np.log10(np.abs(spectrogram[:, : int(framesize // 2 + 1)]))
+        spectrogram_amp = 20 * np.log10(
+            np.abs(spectrogram[:, : int(framesize // 2 + 1)])
+        )
     else:
         spectrogram_amp = data
     im = ax.imshow(
