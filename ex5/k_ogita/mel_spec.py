@@ -225,7 +225,7 @@ def main():
     ax0.set_title("Mel Filter Bank")
     ax0.set_xlabel("Frequency [Hz]")
     ax0.set_ylabel("Magnitude")
-    fig0.savefig("filter_bank.png")
+    fig0.savefig("fig/filter_bank.png")
 
     fig1 = plt.figure(figsize=(15, 10))
     ax1_1 = fig1.add_subplot(2, 1, 1)
@@ -252,7 +252,7 @@ def main():
         is_spec=True,
     )
     ax1_2.set_title("MFCC")
-    fig1.savefig("mfcc.png")
+    fig1.savefig("fig/mfcc.png")
 
     fig2 = plt.figure(figsize=(15, 10))
     ax2_1 = fig2.add_subplot(2, 1, 1)
@@ -289,7 +289,7 @@ def main():
     fig2.colorbar(img, aspect=10, pad=0.01, ax=ax2_2, format="%+2.f dB")
     ax2_2.set_ylabel("$\Delta\Delta$MFCC")
 
-    fig2.savefig("delta.png")
+    fig2.savefig("fig/delta.png")
     plt.show()
     plt.close()
 

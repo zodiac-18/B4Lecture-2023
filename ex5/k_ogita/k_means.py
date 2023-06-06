@@ -164,7 +164,7 @@ def main():
     ax.set_title(f"$k$-means clustering of {file_name} ($k={cluster_n}$)")
     ax.legend(loc="upper left")
     if args.save_fig:
-        fig.savefig(f"{file_name}_{cluster_n}.png")
+        fig.savefig(f"fig/{file_name}_{cluster_n}.png")
     plt.show()
 
 
