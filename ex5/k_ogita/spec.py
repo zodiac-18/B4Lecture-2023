@@ -113,11 +113,13 @@ def draw_spectrogram(
         extent=[0, time, 0, samplerate // 2],
         aspect="auto",
         origin="lower",
+        cmap="rainbow"
+        
     )
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="3%", pad=0.05)
     ax.set_ylim(0, min(samplerate // 2, y_limit))
-    ax.set_xlabel("Time[s]")
+    #ßax.set_xlabel("Time[s]")
     ax.set_ylabel("Frequency[Hz]")
     ax.set_title("Spectrogram")
     plt.colorbar(im, ax=ax, format="%+2.f dB", cax=cax)

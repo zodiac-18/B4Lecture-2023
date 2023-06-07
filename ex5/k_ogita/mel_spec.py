@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.fftpack.realtransforms
 import soundfile as sf
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import spec as s
 
@@ -114,8 +115,8 @@ class MelFilterBank:
         # Calculate the number of times to do windowing
         split_time = int(N / step)
         window = np.hamming(self.framesize)
-        filterbank, f_centers = self.melfilterbank()
-        mfcc = np.zeros((split_time, ncepstrum))
+        filterbank = self.melfilterbank()
+        mfcc = np.zeros((ncepstrum, split_time))
         mel_spectrum = np.zeros((split_time))
         for t in range(split_time):
             if t * step + self.framesize > N:
@@ -126,7 +127,7 @@ class MelFilterBank:
             comp_fbank = np.where(comp_fbank == 0, np.finfo(float).eps, comp_fbank)
             mel_spectrum = 20 * np.log10(comp_fbank)
             cepstrum = scipy.fftpack.dct(mel_spectrum, type=2, norm="ortho")
-            mfcc[t, :] = cepstrum[1 : ncepstrum + 1]
+            mfcc[:, t] = cepstrum[1 : ncepstrum + 1]
         return mfcc
 
     def delta(self, mfcc, l=2):
@@ -140,12 +141,12 @@ class MelFilterBank:
         Returns:
             ndarray: ΔMFCC.
         """
-        mfcc_pad = np.pad(mfcc, [(0, 0), (l, l + 1)], "edge")
+        mfcc_pad = np.pad(mfcc, [[l, l+1], [0, 0]], "edge")
         k_square = np.sum(np.power(np.arange(-l, l + 1), 2))
         k_sequence = np.arange(-l, l + 1)
-        delta_mfcc = np.zeros_like(mfcc_pad)
-        for i in range(mfcc.shape[1]):
-            delta_mfcc[:, i] = np.dot(k_sequence, mfcc_pad[:, i : i + l * 2 + 1].T)
+        delta_mfcc = np.zeros_like(mfcc)
+        for i in range(mfcc.shape[0]):
+            delta_mfcc[i] = np.dot(k_sequence, mfcc_pad[i : i + l * 2 + 1])
         delta_mfcc = delta_mfcc / k_square
         return delta_mfcc
 
@@ -206,6 +207,8 @@ def main():
     f0 = args.fo
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
+    time = len(data) / samplerate
+    data = data + np.random.rand(round(samplerate*time)) / 10000
 
     MFB = MelFilterBank(samplerate, f0, degree, framesize, overlap)
     mfcc = MFB.calc_mfcc(data, ncepstrum)
@@ -216,6 +219,7 @@ def main():
 
     cmap_keyword = "jet"
     cmap = plt.get_cmap(cmap_keyword)
+    
 
     fig0 = plt.figure(figsize=(15, 10))
     ax0 = fig0.add_subplot(111)
@@ -228,7 +232,8 @@ def main():
     fig0.savefig("fig/filter_bank.png")
 
     fig1 = plt.figure(figsize=(15, 10))
-    ax1_1 = fig1.add_subplot(2, 1, 1)
+    fig1.subplots_adjust(hspace=0.6)
+    ax1_1 = fig1.add_subplot(4, 1, 1)
     s.draw_spectrogram(
         data,
         ax=ax1_1,
@@ -240,9 +245,9 @@ def main():
     )
     ax1_1.set_title("Original Signal")
 
-    ax1_2 = fig1.add_subplot(2, 1, 2)
+    ax1_2 = fig1.add_subplot(4, 1, 2)
     s.draw_spectrogram(
-        mfcc,
+        mfcc.T,
         ax=ax1_2,
         framesize=framesize,
         y_limit=samplerate // 2,
@@ -252,12 +257,12 @@ def main():
         is_spec=True,
     )
     ax1_2.set_title("MFCC")
-    fig1.savefig("fig/mfcc.png")
-
+    
     fig2 = plt.figure(figsize=(15, 10))
-    ax2_1 = fig2.add_subplot(2, 1, 1)
-    img = ax2_1.imshow(
-        delt[:ncepstrum].T,
+    print(delt.shape)
+    ax2_1 = fig1.add_subplot(4, 1, 3)
+    img2_1 = ax2_1.imshow(
+        delt[:ncepstrum],
         aspect="auto",
         extent=[0, len(data) / samplerate, 0, ncepstrum],
         cmap="rainbow",
@@ -265,16 +270,18 @@ def main():
     )
     ax2_1.set(
         title="$\Delta$MFCC sequence",
-        xlabel="time[s]",
+        #sxlabel="time[s]",
         ylabel="$\Delta$MFCC",
         yticks=range(0, 13, 4),
     )
-    fig2.colorbar(img, aspect=10, pad=0.01, ax=ax2_1, format="%+2.f dB")
+    divider = make_axes_locatable(ax2_1)
+    cax = divider.append_axes("right", size="3%", pad=0.05)
+    plt.colorbar(img2_1, ax=ax2_1, format="%+2.f dB", cax=cax)
     ax2_1.set_ylabel("$\Delta$MFCC")
 
-    ax2_2 = fig2.add_subplot(2, 1, 2)
-    img = ax2_2.imshow(
-        deltdelt[:ncepstrum].T,
+    ax2_2 = fig1.add_subplot(4, 1, 4)
+    img2_2 = ax2_2.imshow(
+        deltdelt[:ncepstrum],
         aspect="auto",
         extent=[0, len(data) / samplerate, 0, ncepstrum],
         cmap="rainbow",
@@ -282,14 +289,17 @@ def main():
     )
     ax2_2.set(
         title="$\Delta\Delta$MFCC sequence",
-        xlabel="time[s]",
+        xlabel="Time[s]",
         ylabel="$\Delta\Delta$MFCC",
         yticks=range(0, 13, 4),
     )
-    fig2.colorbar(img, aspect=10, pad=0.01, ax=ax2_2, format="%+2.f dB")
+    divider = make_axes_locatable(ax2_2)
+    cax = divider.append_axes("right", size="3%", pad=0.05)
+    plt.colorbar(img2_2, ax=ax2_2, format="%+2.f dB", cax=cax)
     ax2_2.set_ylabel("$\Delta\Delta$MFCC")
 
-    fig2.savefig("fig/delta.png")
+    fig1.savefig("fig/mfcc.png")
+    plt.tight_layout()
     plt.show()
     plt.close()
 
