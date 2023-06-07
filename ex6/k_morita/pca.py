@@ -98,11 +98,21 @@ def data3():
     pca = PCA(n_componets=None)
     pca.fit(data)
     contribution_rate = pca.contribution_rate()
-    for i in range(1, 100):
-        total_rate = np.sum(contribution_rate[:i])
-        if 0.85 < total_rate < 0.92: 
-            print(i, f'{total_rate=}')
+    x = np.arange(100)
+    total_rate = [np.sum(contribution_rate[:i]) for i in x]
 
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(111)
+    ax.plot(x+1, total_rate, label="total contribution rate")
+    ax.hlines(0.9, xmin=0, xmax=100, colors="orange")
+    ax.set_title("n_component - Total Contoribution Rate")
+    ax.set_xlabel("component number")
+    ax.set_ylabel("total contoribution rate")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 1)
+    ax.legend()
+
+    plt.savefig("pca_data3.png")
 
 if __name__ == "__main__":
     # data1()
