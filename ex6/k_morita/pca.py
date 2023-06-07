@@ -13,7 +13,7 @@ class PCA:
         self.data = self._standardize(data)
         cov = np.cov(self.data, rowvar=False)
         self.eigen_value, self.eigen_vector = np.linalg.eig(cov)
-        self.W = self.eigen_vector[np.argsort(-self.eigen_value)][
+        self.W = self.eigen_vector[:, np.argsort(-self.eigen_value)][
             :, : self.n_components
         ]
 
@@ -22,7 +22,7 @@ class PCA:
 
     def eigen(self):
         return self.eigen_value, self.eigen_vector
-    
+
     def contribution_rate(self):
         return self.eigen_value / np.sum(self.eigen_value)
 
