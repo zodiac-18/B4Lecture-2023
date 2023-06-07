@@ -1,4 +1,5 @@
 """Princple Component Analysis."""
+from matplotlib.animation import FuncAnimation
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -66,19 +67,30 @@ def data2():
     slope_xz = eigen_vector[2] / eigen_vector[0]
     x = np.linspace(np.min(data[:, 0]), np.max(data[:, 1]), 100)
 
-    # draw oroginal data
+    # draw original data
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(data[:, 0], data[:, 1], label="original data")
-    ax.plot(x, slope_xy[0] * x, slope_xz[0] * x, label=f'princple component 1(c rate={contribution_rate[0]:.3f})')
-    ax.plot(x, slope_xy[1] * x, slope_xz[1] * x, label=f'princple component 2(c rate={contribution_rate[1]:.3f})')
-    ax.plot(x, slope_xy[2] * x, slope_xz[2] * x, label=f'princple component 3(c rate={contribution_rate[2]:.3f})')
-    ax.set_title("Observed data")
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.set_zlabel("z")
-    ax.legend()
-    plt.savefig("pca_data2_origin.png")
+    def init():
+        ax.scatter(data[:, 0], data[:, 1], label="original data")
+        ax.plot(x, slope_xy[0] * x, slope_xz[0] * x, label=f'princple component 1(c rate={contribution_rate[0]:.3f})')
+        ax.plot(x, slope_xy[1] * x, slope_xz[1] * x, label=f'princple component 2(c rate={contribution_rate[1]:.3f})')
+        ax.plot(x, slope_xy[2] * x, slope_xz[2] * x, label=f'princple component 3(c rate={contribution_rate[2]:.3f})')
+        ax.set_title("Observed data")
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_zlabel("z")
+        ax.view_init(elev=30, azim=45, roll=15)
+        ax.legend()
+
+    def update(frame):
+        if 0 <= frame < 30:
+            ax.view_init(elev=30+frame, azim=45, roll=15)
+        elif 30 <= frame < 60:
+            ax.view_init(elev=30+30, azim=45+frame%30, roll=15)
+        else:
+            pass
+    ani = FuncAnimation(fig, update, frames=np.arange(60), init_func=init, repeat=False)
+    ani.save("pca_data2_origin.gif", writer="pillow")
     plt.clf()
 
     # draw transformed data
