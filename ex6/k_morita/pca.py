@@ -14,9 +14,9 @@ class PCA:
         self.data = self._standardize(data)
         cov = np.cov(self.data, rowvar=False)
         self.eigen_value, self.eigen_vector = np.linalg.eig(cov)
-        self.W = self.eigen_vector[:, np.argsort(-self.eigen_value)][
-            :, : self.n_components
-        ]
+        self.eigen_vector = self.eigen_vector[:, np.argsort(-self.eigen_value)]
+        self.eigen_value = sorted(self.eigen_value, reverse=True)
+        self.W = self.eigen_vector[:, : self.n_components]
 
     def transform(self, data):
         return data @ self.W
@@ -128,5 +128,5 @@ def data3():
 
 if __name__ == "__main__":
     # data1()
-    data2()
-    # data3()
+    # data2()
+    data3()
