@@ -1,171 +1,85 @@
-"Main."
+"""Perform clustering and MFCC analysis."""
 import argparse
 
-import librosa
-import librosa.display as lidi
-import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
-import k_means as km
-import mfcc
-
-
-def parse_args():
-    """Retrieve variables from the command prompt."""
-    parser = argparse.ArgumentParser(description="Perform k-means and mfcc")
-    parser.add_argument(
-        "--csv_file",
-        type=str,
-        help="data csv file",
-    )
-    parser.add_argument(
-        "--cluster",
-        type=int,
-        default=2,
-        help="number of cluster",
-    )
-    parser.add_argument(
-        "--nfft",
-        type=int,
-        default="512",
-        help="number of FFT points",
-    )
-    parser.add_argument(
-        "--ceps",
-        type=int,
-        default="12",
-        help="number of cepstrum",
-    )
-    parser.add_argument(
-        "--wav_file",
-        type=str,
-        help="data wav file",
-    )
-
-    return parser.parse_args()
+import k_means
+import mfcc_analysis as mfana
 
 
-def open_csv(file_path):
-    """Read csv file.
-    Args:
-        file_path (str): Csv file to read
-    Returns:
-        ndarray: Data read
+def run_k_means(filename):
     """
-    data_set = np.loadtxt(fname=file_path, delimiter=",", skiprows=1)
+    Run k_means and plot graph
 
-    return data_set
-
-
-def scat_plot2d(data, k):
-    """Plot two-dimensional data.
     Args:
-        x (ndarray): data of x axis
-        y (ndarray): data of y axis
-        beta_r (ndarray): Regularized regression coefficient
-        beta (ndarray): regression coefficient
+        filename (str): csv file name
     """
-    labels, _ = km.k_means2d(data, k, 100)
+    data = pd.read_csv(filename)
+    data = np.array(data)
+    dimension = len(data[0])
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    ax.scatter(data[:, 0], data[:, 1], c=labels)
-    ax.set_title("K-Means 2d")
-    ax.set_xlabel("$x_1$")
-    ax.set_ylabel("$x_2$")
-    plt.savefig('result/Kmeans.png')
-    plt.show()
-    plt.close()
+    N = 4
 
+    if dimension == 2:
+        fig, ax = plt.subplots((N + 1) // 2, 2, figsize=(12, 10))
+        fig.subplots_adjust(hspace=0.3, wspace=0.2)
+        for k in range(0, N):
+            x, y, cluster_n = k_means.k_means_2d(data, k + 2)
+            ax[k // 2][k % 2].set_title(f"cluster-{k + 2}")
+            ax[k // 2][k % 2].scatter(x, y, c=cluster_n, s=30)
+            ax[k // 2][k % 2].set_xlabel("x")
+            ax[k // 2][k % 2].set_ylabel("y")
+        # extract the png so that the filename of the gif is the original filename.
+        plt.savefig(f"{filename[2:-4]}.png")
 
-def scat_plot3d(data, k):
-    """Plot three-dimensional data.
-    Args:
-        x (ndarray): data of x axis
-        y (ndarray): data of y axis
-        z (ndarray): data of z axis
-        beta_r (ndarray): Regularized regression coefficient
-        beta (ndarray): regression coefficient
-        N1 (int) : dimension of x
-        N2 (int) : dimension of y
-    """
-    labels, _ = km.k_means3d(data, k, 100)
+    elif dimension == 3:
+        fig = plt.figure(figsize=(12, 10))
+        fig.subplots_adjust(hspace=0.3, wspace=0.2)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
-    ax.set_xlabel("$x_1$")
-    ax.set_ylabel("$x_2$")
-    ax.set_zlabel("$x_3$")
-    ax.set_title("K-Means 3d")
-    ax.scatter(data[:, 0], data[:, 1], data[:, 2], c=labels)
-    plt.savefig('result/Kmeans.png')
-    plt.show()
+        def rotate(angle):
+            # rotate 3D graph
+            for i in range(N):
+                axes[i].view_init(azim=angle)
 
-
-def mel_plot(data, fs, mfcc, d, dd):
-    """Plot melspectrum.
-    Args:
-        data (nadarray): target data
-        fs (int): sampling frequency
-        mfcc (ndarray): mfcc data
-        d (ndarray): delta data
-        dd (ndarray): delta delta data
-    """
-    # plot original spectrogram
-    plt.subplot(111)
-    plt.specgram(data, fs)
-    plt.colorbar()
-    plt.xlabel("Time[s]")
-    plt.ylabel("Frequency[Hz]")
-    plt.savefig("result/original_spec.png")
-    plt.show()
-    plt.clf()
-    plt.close()
-
-    # plot mfcc, delta, deltadelta
-    plt.subplot(311)
-    lidi.specshow(mfcc.T)
-    plt.colorbar()
-    plt.ylabel("MFCC")
-
-    plt.subplot(312)
-    lidi.specshow(d.T)
-    plt.colorbar()
-    plt.ylabel("Delta")
-
-    plt.subplot(313)
-    lidi.specshow(dd.T)
-    plt.colorbar()
-    plt.ylabel("Delta delta")
-    plt.xlabel("time")
-    plt.savefig("result/mfcc.png")
-
-    plt.show()
+        axes = []
+        for k in range(0, N):
+            x, y, z, cluster_n = k_means.k_means_3d(data, k + 2)
+            ax = fig.add_subplot((N + 1) // 2, 2, k + 1, projection="3d")
+            ax.scatter(x, y, z, c=cluster_n, s=10)
+            ax.set_title(f"cluster-{k + 2}")
+            ax.set_xlabel("x")
+            ax.set_ylabel("y")
+            ax.set_zlabel("z")
+            axes.append(ax)
+        rot_animation = animation.FuncAnimation(fig, rotate, frames=360, interval=30)
+        # extract the gif so that the filename of the gif is the original filename.
+        rot_animation.save(f"{filename[2:-4]}.gif", writer="pillow", dpi=100)
 
 
 def main():
-    """Regression analysis using the least squares method."""
-    args = parse_args()
+    """
+    Perform k_mean and mfcc
+    """
+    parser = argparse.ArgumentParser(
+        description="Perform clustering and MFCC analysis."
+    )
 
-    file_path = args.csv_file
-    k = args.cluster
+    parser.add_argument("-m", "--mode", help="k: k-means, m: mfcc")
+    parser.add_argument("-f", "--filename", help="File name")
 
-    data = open_csv(file_path)
+    args = parser.parse_args()
 
-    if data.shape[1] == 2:
-        scat_plot2d(data, k)
+    mode = args.mode
+    filename = args.filename
 
-    elif data.shape[1] == 3:
-        scat_plot3d(data, k)
+    if mode == "k":
+        run_k_means(filename)
 
-    data_wav, fs = librosa.load(args.wav_file, mono=True)
-    nfft = args.nfft
-    ceps = args.ceps
-
-    mfcc_data = mfcc.mfcc(data_wav, fs, 40, nfft, ceps)
-    d = mfcc.delta(mfcc_data)
-    dd = mfcc.delta(d)
-    mel_plot(data_wav, fs, mfcc_data, d, dd)
+    elif mode == "m":
+        mfana.mfcc_plot(filename)
 
 
 if __name__ == "__main__":

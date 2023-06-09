@@ -1,121 +1,157 @@
-"K-Means algorithm."
 import numpy as np
-from numpy.random import PCG64, Generator
+import pandas as pd
+import argparse
+import random
 
 
-def random_cent2d(data, k):
-    """Generate first centroids.
-    Args:
-        data (ndarray): target data
-        k (int): number of divisions
-    Returns:
-        ndarray: array of centroids
+def pick_random(data, k: int):
     """
-    dimension = data.shape[1]
-    random = np.zeros((k, dimension))
-    rg_pcg = PCG64()
-    generator = Generator(rg_pcg)
+    Pick random data.
 
-    min_x = np.min(data[:, 0], axis=0)
-    max_x = np.max(data[:, 0], axis=0)
-    min_y = np.min(data[:, 1], axis=0)
-    max_y = np.max(data[:, 1], axis=0)
-    random_x = generator.uniform(min_x, max_x, k)
-    random_y = generator.uniform(min_y, max_y, k)
-    for i in range(0, k):
-        random[i, 0] = random_x[i]
-        random[i, 1] = random_y[i]
-
-    return random
-
-
-def random_cent3d(data, k):
-    """Generate first centroids.
     Args:
-        data (ndarray): target data
-        k (int): number of divisions
+        data (ndarray): Data of csv file
+        k (int): number of clustering
     Returns:
-        ndarray: array of centroids
+        ndarray: randomly picked data
     """
-    dimension = data.shape[1]
-    random = np.zeros((k, dimension))
-    rg_pcg = PCG64()
-    generator = Generator(rg_pcg)
-
-    min_x = np.min(data[:, 0], axis=0)
-    max_x = np.max(data[:, 0], axis=0)
-    min_y = np.min(data[:, 1], axis=0)
-    max_y = np.max(data[:, 1], axis=0)
-    min_z = np.min(data[:, 2], axis=0)
-    max_z = np.max(data[:, 2], axis=0)
-    random_x = generator.uniform(min_x, max_x, k)
-    random_y = generator.uniform(min_y, max_y, k)
-    random_z = generator.uniform(min_z, max_z, k)
-    for i in range(0, k):
-        random[i, 0] = random_x[i]
-        random[i, 1] = random_y[i]
-        random[i, 2] = random_z[i]
-
-    return random
+    index = random.sample(range(len(data)), k)
+    value = data[index]
+    return value
 
 
-def k_means2d(data, K, max_iters):
-    """Calculate kmeans of 2d.
+def k_means_2d(data, k: int):
+    """
+    Calculate k_means algorithm (2d).
+
     Args:
-        data (ndarray): target data
-        K (int): number of divisions
-        max_iters (int): number of max loop
+        data (ndarray): data of csv file
+        k (int): number of clustering
     Returns:
-        ndarray: labels and centroids
+        x (ndarray): Parameter of original data
+        y (ndarray): Parameter of original data
+        cluster_n (ndarray): cluster number
     """
+    centroids = pick_random(data, k)
+    x, y = data.T
+    cluster_n = []
 
-    centroids = random_cent2d(data, K)
+    for i in range(len(data)):
+        dist = np.array([])
+        for j in range(k):
+            dist = np.append(dist, np.linalg.norm(data[i] - centroids[j]))
+        cluster_n = np.append(cluster_n, np.argmin(dist))
 
-    for _ in range(max_iters):
-        # 各データ点を最も近いクラスタ中心に割り当てる
-        distances = np.linalg.norm(data[:, np.newaxis] - centroids, axis=2)
-        labels = np.argmin(distances, axis=1)
+    e_avg = 1.0
+    # loop until new center equal pre center
+    while e_avg != 0.0:
+        sum = np.zeros(shape=(k, 2))
+        e = 0
+        for i in range(len(data)):
+            for j in range(k):
+                if cluster_n[i] == j:
+                    sum[j] += data[i]
 
-        # 新しいクラスタ中心を計算
-        new_centroids = np.array(
-            [data[labels == k].mean(axis=0) for k in range(K)]
-        )
+        n_points = np.array([])
+        center = np.zeros(shape=(k, 2))
+        for i in range(k):
+            n_points = np.append(n_points, np.count_nonzero(cluster_n == i))
+            # calculate average
+            center[i][0] = sum[i][0] / n_points[i]
+            center[i][1] = sum[i][1] / n_points[i]
+        cluster_n = []
 
-        # クラスタ中心の変化が小さい場合は終了
-        if np.allclose(centroids, new_centroids):
-            break
+        for i in range(len(data)):
+            dist = np.array([])
+            for j in range(k):
+                dist = np.append(dist, np.linalg.norm(data[i] - center[j]))
+            cluster_n = np.append(cluster_n, np.argmin(dist))
 
-        centroids = new_centroids
+        for j in range(k):
+            e += np.linalg.norm(center[j] - centroids[j], ord=2)
+        e_avg = e / k
+        centroids = center
 
-    return labels, centroids
+    return x, y, cluster_n
 
 
-def k_means3d(data, K, max_iters):
-    """Calculate kmeans of 3d.
+def k_means_3d(data, k: int):
+    """
+    Calculate k_means algorithm (2d).
+
     Args:
-        data (ndarray): target data
-        K (int): number of divisions
-        max_iters (int): number of max loop
+        data (ndarray): data of csv file
+        k (int): number of clustering
     Returns:
-        ndarray: labels and centroids
+        x (ndarray): Parameter of original data
+        y (ndarray): Parameter of original data
+        z (ndarray): Parameter of original data
+        cluster_n (ndarray): cluster number
     """
+    centroids = pick_random(data, k)
+    x, y, z = data.T
+    cluster_n = []
 
-    centroids = random_cent3d(data, K)
+    for i in range(len(data)):
+        dist = np.array([])
+        for j in range(k):
+            dist = np.append(dist, np.linalg.norm(data[i] - centroids[j]))
+        cluster_n = np.append(cluster_n, np.argmin(dist))
 
-    for _ in range(max_iters):
-        # 各データ点を最も近いクラスタ中心に割り当てる
-        distances = np.linalg.norm(data[:, np.newaxis] - centroids, axis=2)
-        labels = np.argmin(distances, axis=1)
+    e_avg = 1.0
+    # loop until new center equal pre center
+    while e_avg != 0.0:
+        sum = np.zeros(shape=(k, 3))
+        e = 0
+        for i in range(len(data)):
+            for j in range(k):
+                if cluster_n[i] == j:
+                    sum[j] += data[i]
 
-        # 新しいクラスタ中心を計算
-        new_centroids = np.array(
-            [data[labels == k].mean(axis=0) for k in range(K)]
-        )
+        n_points = np.array([])
+        center = np.zeros(shape=(k, 3))
+        for i in range(k):
+            n_points = np.append(n_points, np.count_nonzero(cluster_n == i))
+            # calcule average
+            center[i][0] = sum[i][0] / n_points[i]
+            center[i][1] = sum[i][1] / n_points[i]
+            center[i][2] = sum[i][2] / n_points[i]
 
-        # クラスタ中心の変化が小さい場合は終了
-        if np.allclose(centroids, new_centroids):
-            break
+        cluster_n = []
 
-        centroids = new_centroids
+        for i in range(len(data)):
+            dist = np.array([])
+            for j in range(k):
+                dist = np.append(dist, np.linalg.norm(data[i] - center[j]))
+            cluster_n = np.append(cluster_n, np.argmin(dist))
 
-    return labels, centroids
+        for j in range(k):
+            e += np.linalg.norm(center[j] - centroids[j], ord=2)
+        e_avg = e / k
+        centroids = center
+
+    return x, y, z, cluster_n
+
+
+def main():
+    """Get calculated data from k_means algorithm."""
+    parser = argparse.ArgumentParser(
+        description='Program for getting calculated data from k_means algorithm.')
+    parser.add_argument("-f", dest="filename", help='Filename', required=True)
+    parser.add_argument("-k", dest="k", type=int,
+                        help='number for clustering', required=False, default=4)
+    args = parser.parse_args()
+    data = pd.read_csv(args.filename)
+    data = np.array(data)
+    k = args.k
+    dimension = np.shape(data)[1]
+
+    if dimension == 2:
+        x, y = data.T
+        k_means_2d(data, k)
+    elif dimension == 3:
+
+        k_means_3d(data, k)
+
+
+if __name__ == "__main__":
+    main()
