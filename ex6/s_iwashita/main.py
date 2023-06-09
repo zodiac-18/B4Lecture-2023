@@ -11,10 +11,11 @@ class PCA:
     """This is a class associated with PCA."""
 
     def __init__(self, filename):
+        """Define arguments."""
         self.filename = filename
 
     def fit(self):
-        """Perform PCA:"""
+        """Perform PCA."""
         self.data = np.loadtxt(self.filename, delimiter=",")
         # Standardize data
         self.data_ss = scipy.stats.zscore(self.data)
@@ -33,7 +34,7 @@ class PCA:
         self.contribution_rate = self.eig / np.sum(self.eig)
 
     def transform(self):
-        """Transform data"""
+        """Transform data."""
         self.data_tf = np.dot(self.data, self.w)
 
     def plot_scatter(self):
