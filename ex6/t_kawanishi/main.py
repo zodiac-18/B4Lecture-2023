@@ -80,8 +80,7 @@ if __name__ == "__main__":
         fig = plt.figure()
         ax = fig.add_subplot(projection="3d")
         ax.scatter(
-            data_n.T[0], data_n.T[1], data_n.T[2],
-            edgecolors="red", facecolor="None"
+            data_n.T[0], data_n.T[1], data_n.T[2], edgecolors="red", facecolor="None"
         )
         ax.set_xlabel("$X_{1}$")
         ax.set_ylabel("$X_{2}$")

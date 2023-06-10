@@ -1,10 +1,10 @@
-"""Function about principal component analysis"""
+"""Function about principal component analysis."""
 import matplotlib.pyplot as plt
 import numpy as np
 
 
 def normalize(data: np.ndarray) -> np.ndarray:
-    """Normalization.
+    """To Normalization.
 
     Args:
         data (np.ndarray): data
@@ -78,8 +78,7 @@ def dimComp(data: np.ndarray, eigen_pair: np.ndarray, dim: int) -> np.ndarray:
 
 
 def PlotConRate(c_rate: np.ndarray, targetR=0.9) -> int:
-    """Find out in what dimension
-        cumulative contribution rate are bigger than targetR.
+    """Find out in what dimension cumulative contribution rate are bigger than targetR.
 
     Args:
         c_rate (np.ndarray): contribution rate
@@ -97,8 +96,7 @@ def PlotConRate(c_rate: np.ndarray, targetR=0.9) -> int:
 
     # plot graph
     plt.figure()
-    plt.plot(np.arange(1, len(cumCrate) + 1), cumCrate,
-             label="Cum contribution R")
+    plt.plot(np.arange(1, len(cumCrate) + 1), cumCrate, label="Cum contribution R")
     plt.plot([1, len(cumCrate)], [targetR, targetR])
     plt.plot(
         dim,

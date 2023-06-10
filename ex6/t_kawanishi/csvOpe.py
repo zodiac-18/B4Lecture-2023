@@ -5,7 +5,7 @@ import numpy as np
 
 
 def read_csv(path: str) -> np.ndarray:
-    """read out csv to matrix
+    """Read out csv to matrix.
 
     Args:
         path (str): the csv file path
