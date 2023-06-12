@@ -1,12 +1,12 @@
 """Perform principal component analysis."""
 import argparse
 
+import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats
 from matplotlib.ticker import MaxNLocator
 from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.animation as animation
 
 
 class PCA:
@@ -127,12 +127,18 @@ class PCA:
                 ax.xaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.yaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.zaxis.set_major_locator(MaxNLocator(integer=True))
+
                 def rotate(angle):
                     ax.view_init(azim=angle * 5)
+
                 ax.grid(ls="--")
                 ax.legend(loc="upper left")
-                rot_animation = animation.FuncAnimation(fig, rotate, frames=50, interval=200)
-                rot_animation.save("result/{}.gif".format(self.filename[3:8]), writer="pillow", dpi=100)
+                rot_animation = animation.FuncAnimation(
+                    fig, rotate, frames=50, interval=200
+                )
+                rot_animation.save(
+                    "result/{}.gif".format(self.filename[3:8]), writer="pillow", dpi=100
+                )
             ax.grid(ls="--")
             ax.legend(loc="upper left")
             plt.savefig("result/{}.png".format(self.filename[3:8]))
@@ -144,9 +150,17 @@ class PCA:
         self.dimension_above_90 = np.min(np.where(self.cum_con_rate >= 0.9)) + 1
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.plot(range(1, len(self.cum_con_rate) + 1), self.cum_con_rate, c="b", label="Cumulative contribution rate")
         ax.plot(
-            self.dimension_above_90, self.cum_con_rate[self.dimension_above_90 - 1], "D-", c="g"
+            range(1, len(self.cum_con_rate) + 1),
+            self.cum_con_rate,
+            c="b",
+            label="Cumulative contribution rate",
+        )
+        ax.plot(
+            self.dimension_above_90,
+            self.cum_con_rate[self.dimension_above_90 - 1],
+            "D-",
+            c="g",
         )
         ax.axline(
             (self.dimension_above_90, 0),
@@ -215,10 +229,16 @@ class PCA:
                 ax.xaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.yaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.zaxis.set_major_locator(MaxNLocator(integer=True))
+
                 def rotate(angle):
                     ax.view_init(azim=angle * 5)
-                rot_animation = animation.FuncAnimation(fig, rotate, frames=50, interval=200)
-                rot_animation.save("result/{}.gif".format(self.filename[3:8]), writer="pillow", dpi=100)
+
+                rot_animation = animation.FuncAnimation(
+                    fig, rotate, frames=50, interval=200
+                )
+                rot_animation.save(
+                    "result/{}.gif".format(self.filename[3:8]), writer="pillow", dpi=100
+                )
             ax.grid(ls="--")
             plt.savefig("result/{}_compressed.png".format(self.filename[3:8]))
             plt.close()
