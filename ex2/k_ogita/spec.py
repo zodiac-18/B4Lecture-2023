@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import os
 
 
 def stft(data, framesize, overlap):
@@ -98,14 +99,19 @@ def main():
     parser.add_argument(
         "-o", "--overlap", help="the rate of overlap", default=0.8, type=float
     )
+    parser.add_argument(
+        "-e", "--export_name", help="name of output audio file", default=None, type=str
+    )
     args = parser.parse_args()
 
     sound_file = args.path
+    # Get the filename of data from the path
+    file_name = os.path.splitext(os.path.basename(sound_file))[0]
     # Window size
     framesize = args.framesize
     # Rate of overlap
     overlap = args.overlap
-    print(overlap, framesize)
+    export_name = args.export_name
     # Get waveform and sampling rate from the audio file
     data, samplerate = sf.read(sound_file)
     # Calculate the playback time of the input waveform
@@ -147,17 +153,15 @@ def main():
     # Compute the original waveform from the spectrogram
     istft_wave = istft(spectrogram, framesize, overlap)
     # Create audio files from re-synthesized waveforms
-    sf.write("re-miku.wav", istft_wave, samplerate)
+    if export_name == None:
+        sf.write(f"re-{file_name}", istft_wave, samplerate)
+    else:
+        sf.write(f"{export_name}" if export_name.endswith('.wav') else f"{export_name}.wav", istft_wave, samplerate)
 
     # Plot re-synthesized waveform
     ax3 = fig.add_subplot(3, 1, 3)
     # Create a time axis
     t_3 = np.arange(0, len(istft_wave)) / samplerate
-    # if len(istft_wave) > len(data):
-    #    data = np.append(data, [0]*(len(istft_wave)-len(data)))
-    # else:
-    #    istft_wave = np.append(istft_wave, [0]*(len(data)-len(istft_wave)))
-    # print(np.mean((data-istft_wave)**2))
     ax3.plot(t_3, istft_wave)
     plt.title("Re-Synthesized signal")
     plt.xlabel("Time[s]")
