@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats
 from matplotlib.ticker import MaxNLocator
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
 
 
 class PCA:
@@ -125,6 +127,12 @@ class PCA:
                 ax.xaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.yaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.zaxis.set_major_locator(MaxNLocator(integer=True))
+                def rotate(angle):
+                    ax.view_init(azim=angle * 5)
+                ax.grid(ls="--")
+                ax.legend(loc="upper left")
+                rot_animation = animation.FuncAnimation(fig, rotate, frames=50, interval=200)
+                rot_animation.save("result/{}.gif".format(self.filename[3:8]), writer="pillow", dpi=100)
             ax.grid(ls="--")
             ax.legend(loc="upper left")
             plt.savefig("result/{}.png".format(self.filename[3:8]))
@@ -133,22 +141,22 @@ class PCA:
     def plot_cumulative_contribution_rate(self):
         """Calculate and plot cumulative contribution rate."""
         self.cum_con_rate = np.cumsum(self.contribution_rate)
-        self.index_above_90 = np.min(np.where(self.cum_con_rate >= 0.9))
+        self.dimension_above_90 = np.min(np.where(self.cum_con_rate >= 0.9)) + 1
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        ax.plot(self.cum_con_rate, c="b", label="Cumulative contribution rate")
+        ax.plot(range(1, len(self.cum_con_rate) + 1), self.cum_con_rate, c="b", label="Cumulative contribution rate")
         ax.plot(
-            self.index_above_90, self.cum_con_rate[self.index_above_90], "D-", c="g"
+            self.dimension_above_90, self.cum_con_rate[self.dimension_above_90 - 1], "D-", c="g"
         )
         ax.axline(
-            (self.index_above_90, 0),
-            (self.index_above_90, self.cum_con_rate[self.index_above_90]),
+            (self.dimension_above_90, 0),
+            (self.dimension_above_90, self.cum_con_rate[self.dimension_above_90]),
             c="g",
-            label="{}".format(self.index_above_90),
+            label="{}".format(self.dimension_above_90),
         )
         ax.set(
             title="{}".format(self.filename[3:8]),
-            xlabel="Index of contribution rate",
+            xlabel="Dimension",
             ylabel="Cumulative contribution rate",
             yticks=[0, 0.2, 0.4, 0.6, 0.8, 1],
         )
@@ -161,14 +169,13 @@ class PCA:
 
     def dimensional_compression(self):
         """Perform dimensional compression."""
-        compression_dim = self.index_above_90 + 1
-        if compression_dim == 2 or compression_dim == 3:
+        if self.dimension_above_90 == 2 or self.dimension_above_90 == 3:
             x_min = int(np.min(self.data_tf[:, 0]) // 1)
             x_max = int(np.max(self.data_tf[:, 0]) // 1 + 1)
             y_min = int(np.min(self.data_tf[:, 1]) // 1)
             y_max = int(np.max(self.data_tf[:, 1]) // 1 + 1)
             fig = plt.figure()
-            if compression_dim == 2:
+            if self.dimension_above_90 == 2:
                 ax = fig.add_subplot(111)
                 ax.scatter(
                     self.data_tf[:, 0],
@@ -185,7 +192,7 @@ class PCA:
                 )
                 ax.xaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-            elif compression_dim == 3:
+            elif self.dimension_above_90 == 3:
                 z_min = int(np.min(self.data_tf[:, 2]) // 1)
                 z_max = int(np.max(self.data_tf[:, 2]) // 1 + 1)
                 ax = fig.add_subplot(111, projection="3d")
@@ -208,6 +215,10 @@ class PCA:
                 ax.xaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.yaxis.set_major_locator(MaxNLocator(integer=True))
                 ax.zaxis.set_major_locator(MaxNLocator(integer=True))
+                def rotate(angle):
+                    ax.view_init(azim=angle * 5)
+                rot_animation = animation.FuncAnimation(fig, rotate, frames=50, interval=200)
+                rot_animation.save("result/{}.gif".format(self.filename[3:8]), writer="pillow", dpi=100)
             ax.grid(ls="--")
             plt.savefig("result/{}_compressed.png".format(self.filename[3:8]))
             plt.close()
