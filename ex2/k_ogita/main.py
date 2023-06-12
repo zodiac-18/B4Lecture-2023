@@ -4,12 +4,12 @@
 """Make a digital filter."""
 
 import argparse
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import os
 from numpy.lib.stride_tricks import as_strided
 
 import spec as s
@@ -26,7 +26,7 @@ def sinc(x, norm=False):
     Returns:
         float: Output of sinc function.
     """
-    if norm == True:
+    if norm:
         return np.sinc(x)
     else:
         return np.sinc(x / np.pi)
@@ -45,9 +45,12 @@ def conv(sig1, sig2):
     """
     conv_length = len(sig1) + len(sig2) - 1
     conv_sig = np.zeros(conv_length)
-    strided_sig1 = as_strided(sig1, shape=(conv_length, len(sig2)), strides=(sig1.itemsize, sig1.itemsize))
+    strided_sig1 = as_strided(
+        sig1, shape=(conv_length, len(sig2)), strides=(sig1.itemsize, sig1.itemsize)
+    )
     conv_sig += np.dot(strided_sig1, sig2)
     return conv_sig
+
 
 def bef(cf1, cf2, tap, samplerate):
     """
@@ -69,9 +72,12 @@ def bef(cf1, cf2, tap, samplerate):
     # Converts normalized cut-off frequency to angular frequency
     cw1 = 2 * np.pi * cf1 / samplerate
     cw2 = 2 * np.pi * cf2 / samplerate
-    
+
     i_lis = np.arange(-tap // 2, tap // 2 + 1)
-    h = sinc(np.pi * i_lis) + (cw1 * sinc(cw1 * i_lis) - cw2 * sinc(cw2 * i_lis)) / np.pi
+    h = (
+        sinc(np.pi * i_lis)
+        + (cw1 * sinc(cw1 * i_lis) - cw2 * sinc(cw2 * i_lis)) / np.pi
+    )
     return h * window
 
 
@@ -144,11 +150,11 @@ def main():
     disp_lim = tap // 2 + 1 if tap % 2 != 0 else tap // 2
     # Convert　the filter to frequency domain
     filter_freq = np.fft.fft(filter)
-    filter_abs = np.abs(filter_freq)[: disp_lim]
-    filter_phase = np.unwrap(np.angle(filter_freq))[: disp_lim] * 180 / np.pi
+    filter_abs = np.abs(filter_freq)[:disp_lim]
+    filter_phase = np.unwrap(np.angle(filter_freq))[:disp_lim] * 180 / np.pi
 
-    freq = np.fft.fftfreq(tap, d=1.0 / samplerate)[: disp_lim] / 1000
-    
+    freq = np.fft.fftfreq(tap, d=1.0 / samplerate)[:disp_lim] / 1000
+
     fig1, ax1 = plt.subplots(2, 1, figsize=(10, 10))
     # Plot frequency response of BEF
     ax1[0].plot(freq, filter_abs)
@@ -205,10 +211,14 @@ def main():
     istft_wave = s.istft(filtered_spec, framesize, overlap)
 
     # Create audio files from re-synthesized waveforms
-    if export_name == None:
+    if export_name is None:
         sf.write(f"re-{file_name}.wav", istft_wave, samplerate)
     else:
-        sf.write(f"{export_name}" if export_name.endswith('.wav') else f"{export_name}.wav", istft_wave, samplerate)
+        sf.write(
+            f"{export_name}" if export_name.endswith(".wav") else f"{export_name}.wav",
+            istft_wave,
+            samplerate,
+        )
 
     # Plot re-synthesized waveform
     fig3, ax3 = plt.subplots(1, 1, figsize=(10, 10))

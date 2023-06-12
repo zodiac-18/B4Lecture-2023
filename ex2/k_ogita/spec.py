@@ -4,12 +4,12 @@
 """Generate spectrogram and re-synthesized waveform."""
 
 import argparse
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
 import soundfile as sf
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import os
 
 
 def stft(data, framesize, overlap):
@@ -153,10 +153,14 @@ def main():
     # Compute the original waveform from the spectrogram
     istft_wave = istft(spectrogram, framesize, overlap)
     # Create audio files from re-synthesized waveforms
-    if export_name == None:
+    if export_name is None:
         sf.write(f"re-{file_name}", istft_wave, samplerate)
     else:
-        sf.write(f"{export_name}" if export_name.endswith('.wav') else f"{export_name}.wav", istft_wave, samplerate)
+        sf.write(
+            f"{export_name}" if export_name.endswith(".wav") else f"{export_name}.wav",
+            istft_wave,
+            samplerate,
+        )
 
     # Plot re-synthesized waveform
     ax3 = fig.add_subplot(3, 1, 3)
