@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats
 from matplotlib.ticker import MaxNLocator
-from mpl_toolkits.mplot3d import Axes3D
 
 
 class PCA:
