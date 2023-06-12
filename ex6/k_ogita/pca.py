@@ -19,7 +19,7 @@ class PCA:
         Initialize instance variables.
 
         Args:
-            num_prim_comp (int, optional): Number of eigenvectors to be extracted in fit. Defaults to None.
+            num_prim_comp (int, optional): Number of eigenvectors to be extracted in fit.
         """
         self.num_prim_comp = num_prim_comp
         self.eigin_value = None
@@ -141,7 +141,7 @@ def main():
 
         def animation_init():
             """
-            Initialization function for drawing animation.
+            Initialize plot for drawing animation.
 
             Returns:
                 matplotlib.figure.Figure : Figure.
@@ -176,7 +176,7 @@ def main():
 
         def animate(i):
             """
-            Function for drawing animation
+            Set the viewpoint of the animation.
 
             Returns:
                 matplotlib.figure.Figure : Figure.
@@ -199,9 +199,7 @@ def main():
 
         fig2 = plt.figure(figsize=(15, 10))
         ax2 = fig2.add_subplot(111)
-        ax2.scatter(
-            comp_data[:, 0], comp_data[:, 1], c="blue", label="compressed data"
-        )
+        ax2.scatter(comp_data[:, 0], comp_data[:, 1], c="blue", label="compressed data")
         ax2.set_xlabel("x")
         ax2.set_ylabel("y")
         ax2.set_title(f"Compressed data of {file_name}.csv")
