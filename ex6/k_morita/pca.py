@@ -11,14 +11,24 @@ class PCA:
         self.n_components = n_componets
 
     def fit(self, data):
-        self.data = self._standardize(data)
+        # データを標準化
+        self.data = self.__standardize(data)
+
+        # 共分散行列を作る
         cov = np.cov(self.data, rowvar=False)
+
+        # 共分散行列の固有値、固有ベクトルを得る
         self.eigen_value, self.eigen_vector = np.linalg.eig(cov)
+
+        # 固有値の降順に対応するように固有ベクトルを整列
         self.eigen_vector = self.eigen_vector[:, np.argsort(-self.eigen_value)]
         self.eigen_value = sorted(self.eigen_value, reverse=True)
+
+        # k個の固有ベクトルを射影行列Wとする
         self.W = self.eigen_vector[:, : self.n_components]
 
     def transform(self, data):
+        # 射影行列を使って元データを圧縮
         return data @ self.W
 
     def eigen(self):
@@ -27,7 +37,7 @@ class PCA:
     def contribution_rate(self):
         return self.eigen_value / np.sum(self.eigen_value)
 
-    def _standardize(self, data):
+    def __standardize(self, data):
         data = (data - data.mean(axis=0)) 
         data = data / np.std(data, axis=0)
         return data
