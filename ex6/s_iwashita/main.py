@@ -19,20 +19,20 @@ class PCA:
         """Perform PCA."""
         self.data = np.loadtxt(self.filename, delimiter=",")
         # Standardize data
-        self.data_ss = scipy.stats.zscore(self.data)
+        data_ss = scipy.stats.zscore(self.data)
         # get n_components
         self.n_components = len(self.data[0])
         # Find the variance-covariance matrix of the data
-        self.v_cov = np.cov(self.data_ss.T)
+        v_cov = np.cov(data_ss.T)
         # Find the eigenvalues and eigenvectors of the variance-covariance matrix
-        self.eig, self.eig_vec = np.linalg.eig(self.v_cov)
+        eig, self.eig_vec = np.linalg.eig(v_cov)
         # Sort eigenvalue in descending order
-        self.eig_vec = self.eig_vec[:, np.argsort(-self.eig)]
-        self.eig = sorted(self.eig, reverse=True)
+        self.eig_vec = self.eig_vec[:, np.argsort(-eig)]
+        eig = sorted(eig, reverse=True)
         # Create a projection matrix from eigenvectors
         self.w = self.eig_vec[:, : self.n_components]
         # Calculate contribution rate
-        self.contribution_rate = self.eig / np.sum(self.eig)
+        self.contribution_rate = eig / np.sum(eig)
 
     def transform(self):
         """Transform data."""
@@ -145,25 +145,25 @@ class PCA:
 
     def plot_cumulative_contribution_rate(self):
         """Calculate and plot cumulative contribution rate."""
-        self.cum_con_rate = np.cumsum(self.contribution_rate)
-        self.dimension_above_90 = np.min(np.where(self.cum_con_rate >= 0.9)) + 1
+        cum_con_rate = np.cumsum(self.contribution_rate)
+        self.dimension_above_90 = np.min(np.where(cum_con_rate >= 0.9)) + 1
         fig = plt.figure()
         ax = fig.add_subplot(111)
         ax.plot(
-            range(1, len(self.cum_con_rate) + 1),
-            self.cum_con_rate,
+            range(1, len(cum_con_rate) + 1),
+            cum_con_rate,
             c="b",
             label="Cumulative contribution rate",
         )
         ax.plot(
             self.dimension_above_90,
-            self.cum_con_rate[self.dimension_above_90 - 1],
+            cum_con_rate[self.dimension_above_90 - 1],
             "D-",
             c="g",
         )
         ax.axline(
             (self.dimension_above_90, 0),
-            (self.dimension_above_90, self.cum_con_rate[self.dimension_above_90]),
+            (self.dimension_above_90, cum_con_rate[self.dimension_above_90]),
             c="g",
             label="{}".format(self.dimension_above_90),
         )
