@@ -151,14 +151,15 @@ def main():
     )
     # add arguments
     parser.add_argument("-f", dest="filename", help="Filename", required=True)
-    parser.add_argument("-k", dest="k", help="Number of cluster", default=2)
+    parser.add_argument("-k", dest="k", help="Number of cluster",
+                        type=int, default=2)
     # parse arguments
     args = parser.parse_args()
 
     path = args.filename
     k = args.k
 
-    fname_index = path.find("\\")
+    fname_index = path.find("/")
     fname = path[fname_index + 1:]
     data = load_csv(path)
     Dim = data.shape[1]
@@ -230,7 +231,7 @@ def main():
         plt.tight_layout()
         plt.show()
         # plot contour map
-        plt.scatter(*data.T, marker="o", facecolor="None",
+        plt.scatter(*data.T, marker="o", facecolor="None", alpha=0.3,
                     edgecolors="blue", label="Data")
         plt.scatter(*Mu.T, marker="x", color="red", label="Centroid")
         plt.contour(XX, YY, gauss_3d, cmap="jet")
