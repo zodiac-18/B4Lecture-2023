@@ -61,7 +61,7 @@ class GMM:
         return np.sum(log_likelihood)
 
     def fit(self, X):
-        self.initialize_parameters(X)
+        self.__initialize_parameters(X)
         old_parameters = None
         for _ in range(self.max_iter):
             responsibilities = self.__e_step(X)
@@ -81,9 +81,9 @@ class GMM:
 
     def plot_mixture_distribution(self, X):
         if X.shape[1] == 1:
-            self.plot_1d_mixture_distribution(X)
+            self.__plot_1d_mixture_distribution(X)
         elif X.shape[1] == 2:
-            self.plot_2d_mixture_distribution(X)
+            self.__plot_2d_mixture_distribution(X)
         else:
             print("Unsupported dimensionality for plotting mixture distribution.")
 
