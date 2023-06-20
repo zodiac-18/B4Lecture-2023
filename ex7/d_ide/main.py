@@ -1,9 +1,10 @@
-'Main.'
+"Main."
 import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
 import gmm
 
 
@@ -69,14 +70,13 @@ def plot1d(data):
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.legend()
-    #plt.savefig("result/pca_data2.png")
+    # plt.savefig("result/pca_data2.png")
     plt.show()
     plt.close()
 
 
 def main():
-    """Calculate GMM main file.
-    """
+    """Calculate GMM main file."""
     args = parse_args()
     fname = args.csv_file
     cluster = args.cluster

@@ -1,6 +1,7 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import random
+
+import matplotlib.pyplot as plt
+import numpy as np
 from scipy.stats import multivariate_normal
 
 
@@ -40,7 +41,7 @@ def scatter_1d(data, clu, vec, cov, pi):
     plt.grid()
     plt.legend()
     plt.tight_layout()
-    plt.savefig('result/gmm.png')
+    plt.savefig("result/gmm.png")
     plt.show()
 
 
@@ -67,7 +68,14 @@ def scatter_2d(data, clu, vec, cov, pi):
         ax.plot(x, y, label=i, linestyle="None", marker="o", color=cmap(i))
     x = vec[:, 0]
     y = vec[:, 1]
-    ax.plot(x, y, label="centroids", linestyle="None", marker="x", color=cmap(i + 1))
+    ax.plot(
+        x,
+        y,
+        label="centroids",
+        linestyle="None",
+        marker="x",
+        color=cmap(i + 1)
+    )
 
     posx = np.linspace(np.min(data[:, 0]) - 1, np.max(data[:, 0]) + 1, 100)
     posy = np.linspace(np.min(data[:, 1]) - 1, np.max(data[:, 1]) + 1, 100)
@@ -84,7 +92,7 @@ def scatter_2d(data, clu, vec, cov, pi):
     plt.grid()
     plt.legend()
     plt.tight_layout()
-    plt.savefig('result/gmm.png')
+    plt.savefig("result/gmm.png")
     plt.show()
 
 
@@ -102,7 +110,7 @@ def logplot(log_list):
     plt.title("data", fontsize=18)
     plt.grid()
     plt.tight_layout()
-    plt.savefig('result/log.png')
+    plt.savefig("result/log.png")
     plt.show()
 
 
@@ -201,7 +209,7 @@ def gauss_all(data, vec, cov):
     Nk = np.zeros(num)
 
     for i in range(num):
-        a = ((2 * np.pi) ** (0.5 * dim)) * (det ** 0.5)
+        a = ((2 * np.pi) ** (0.5 * dim)) * (det**0.5)
         b = -0.5 * (data[i] - vec)[None, :] @ inv @ (data[i] - vec)
         Nk[i] = np.exp(b) / a
 
