@@ -1,99 +1,74 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import multivariate_normal
 import random
+from scipy.stats import multivariate_normal
 
 
-# 1次元散布図
-def scatter_1d(data, clu, vec, cov, pi, save=0):
+def scatter_1d(data, clu, vec, cov, pi):
+    """1D scatter plots.
+
+    Args:
+        data (ndarray): target data
+        clu (int): number of cluster
+        vec (ndarray): vector
+        cov (ndarray): covariance
+        pi (ndarray): list of pi
     """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    clu:numpy.ndarray
-        cluster
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
-    save:str
-        save file name
-    """
-    fig = plt.figure(figsize=(8, 6))
+    fig = plt.figure()
     ax = fig.add_subplot(111)
-    num = str(save)[0]
-    K = len(vec)
+    cluster = len(vec)
 
-    # クラスタプロット
     cmap = plt.get_cmap("tab10")
-    for i in range(K):
+    for i in range(cluster):
         cdata = data[clu == i]
         x = cdata
         y = np.zeros(x.shape[0])
-        # 計算値とデータをプロッ
-        ax.plot(x, y, label=i, marker="o", linestyle="None", color=cmap(i))
+        ax.plot(x, y, label=i, marker="o", color=cmap(i))
     x = vec
-    y = np.zeros(K)
-    ax.plot(x, y, label="centroids", marker="x", linestyle="None", color=cmap(i + 1))
+    y = np.zeros(cluster)
+    ax.plot(x, y, label="centroids", marker="x", color=cmap(i + 1))
 
-    # ガウス分布
     pos = np.linspace(np.min(data) - 1, np.max(data) + 1, 100)
     y = np.zeros(100)
-    for k in range(K):
+    for k in range(cluster):
         y += pi[k] * multivariate_normal.pdf(pos, vec[k], cov[k])
     ax.plot(pos, y, label="GMM")
 
-    # ラベル作成
-    ax.set_xlabel("x", fontsize=18)
-    ax.set_ylabel("gaussian distribution", fontsize=18)
-    plt.title("data" + num, fontsize=18)
+    ax.set_xlabel("x")
+    ax.set_ylabel("gaussian distribution")
+    plt.title("data")
     plt.grid()
-    plt.legend()  # 凡例の追加
+    plt.legend()
     plt.tight_layout()
-    if type(save) == str:
-        gmmsave = "gmm" + save
-        plt.savefig(gmmsave)
+    plt.savefig('result/gmm.png')
     plt.show()
 
 
-# 2次元散布図
-def scatter_2d(data, clu, vec, cov, pi, save=0):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    clu:numpy.ndarray
-        cluster
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
-    save:str
-        save file name
-    """
-    fig = plt.figure(figsize=(8, 6))
-    ax = fig.add_subplot(111)
-    num = str(save)[0]
-    K = len(vec)
+def scatter_2d(data, clu, vec, cov, pi):
+    """2D scatter plots.
 
-    # クラスタプロット
+    Args:
+        data (ndarray): target data
+        clu (int): number of cluster
+        vec (ndarray): vector
+        cov (ndarray): covariance
+        pi (ndarray): list of pi
+    """
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    cluster = len(vec)
+
     cmap = plt.get_cmap("tab10")
-    for i in range(K):
+    for i in range(cluster):
         cdata = data[clu == i]
         x = cdata[:, 0]
         y = cdata[:, 1]
-        ax.plot(x, y, label=i, marker="o", linestyle="None", color=cmap(i))
+        ax.plot(x, y, label=i, linestyle="None", marker="o", color=cmap(i))
     x = vec[:, 0]
     y = vec[:, 1]
-    ax.plot(x, y, label="centroids", marker="x", linestyle="None", color=cmap(i + 1))
+    ax.plot(x, y, label="centroids", linestyle="None", marker="x", color=cmap(i + 1))
 
-    # 等高線
     posx = np.linspace(np.min(data[:, 0]) - 1, np.max(data[:, 0]) + 1, 100)
     posy = np.linspace(np.min(data[:, 1]) - 1, np.max(data[:, 1]) + 1, 100)
     posx, posy = np.meshgrid(posx, posy)
@@ -103,82 +78,80 @@ def scatter_2d(data, clu, vec, cov, pi, save=0):
     plt.contour(posx, posy, z)
     plt.colorbar()
 
-    # ラベル作成
-    ax.set_xlabel("x", fontsize=18)
-    ax.set_ylabel("y", fontsize=18)
-    plt.title("data" + num, fontsize=18)
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    plt.title("data")
     plt.grid()
-    plt.legend()  # 凡例の追加
+    plt.legend()
     plt.tight_layout()
-    if type(save) == str:
-        gmmsave = "gmm" + save
-        plt.savefig(gmmsave)
+    plt.savefig('result/gmm.png')
     plt.show()
 
 
-# 初期値決定
-# ミニマックス法
-def minimax(data, K):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    K:int
-      the number of cluster
+def logplot(log_list):
+    """Plot the log-likelihood function.
 
-    return
-    ----
-    cen:numpy.ndarray
-         center of cluster
+    Args:
+        log_list (ndarray): calculated log
+    """
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+    ax.plot(log_list)
+    ax.set_xlabel("count", fontsize=18)
+    ax.set_ylabel("log likelihood function", fontsize=18)
+    plt.title("data", fontsize=18)
+    plt.grid()
+    plt.tight_layout()
+    plt.savefig('result/log.png')
+    plt.show()
+
+
+def minimax(data, cluster):
+    """Calculate minimax method.
+
+    Args:
+        data (ndarray): target data
+        cluster (int): number of cluster
+
+    Returns:
+        ndarray: centroids list
     """
     num, dim = data.shape
-    cidx = []  # 中心のインデックス
+    cidx = []
     cidx = np.append(cidx, random.randint(0, num - 1))
-    dis = np.zeros((K, num))
-    cen = np.zeros((K, dim))
-    for k in range(K):
+    dis = np.zeros((cluster, num))
+    cen = np.zeros((cluster, dim))
+    for k in range(cluster):
         cen[k] = data[int(cidx[k])]
-        r = np.sum((data - data[int(cidx[k])]) ** 2, axis=1)  # 距離計算
-        dis[k] = r  # 距離保存
+        r = np.sum((data - data[int(cidx[k])]) ** 2, axis=1)
+        dis[k] = r
 
-        cidx = np.append(cidx, np.argmax(np.min(dis[: k + 1], axis=0)))  # 距離最大の次の中心
-    # clu = np.argmin(dis, axis=0)
+        cidx = np.append(cidx, np.argmax(np.min(dis[: k + 1], axis=0)))
     return cen
 
 
-# kmeanアルゴリズム
-def kmean(data, K, cen):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    K:int
-      the number of cluster
-    cen:numpy.ndarray
-         center of cluster
-    clu:numpy.ndarray
-        cluster
+def kmean(data, cluster, cen):
+    """Calculate k-means.
 
-    return
-    ----
-    newcen:numpy.ndarray
-           new center of cluster
-    clu:numpy.ndarray
-        cluster
+    Args:
+        data (ndarray): target data
+        cluster (int): number of cluster
+        cen (ndarray): centroids list
+
+    Returns:
+        ndarray: new centroids list
     """
     num, dim = data.shape
-    dis = np.zeros((K, num))
-    newcen = np.zeros((K, dim))
+    dis = np.zeros((cluster, num))
+    newcen = np.zeros((cluster, dim))
     while True:
-        for k in range(0, K):
-            r = np.sum((data - cen[k]) ** 2, axis=1)  # 距離計算
-            dis[k] = r  # 距離保存
+        for k in range(0, cluster):
+            r = np.sum((data - cen[k]) ** 2, axis=1)
+            dis[k] = r
 
         clu = np.argmin(dis, axis=0)
 
-        for i in range(0, K):
+        for i in range(0, cluster):
             newcen[i] = data[clu == i].mean(axis=0)
 
         if np.allclose(cen, newcen) is True:
@@ -187,33 +160,23 @@ def kmean(data, K, cen):
     return newcen, clu
 
 
-# 初期値決定
-def ini(data, K):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    K:int
-      the number of cluster
+def ini(data, cluster):
+    """Calculate initial value.
 
-    returns
-    ---
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
+    Args:
+        data (ndarray): target data
+        cluster (int): number of cluster
 
+    Returns:
+        ndarray: vector, covariance, pi
     """
     num, dim = data.shape
-    cen = minimax(data, K)
-    vec, clu = kmean(data, K, cen)
-    pi = np.zeros(K)
-    cov = np.zeros((K, dim, dim))
+    cen = minimax(data, cluster)
+    vec, clu = kmean(data, cluster, cen)
+    pi = np.zeros(cluster)
+    cov = np.zeros((cluster, dim, dim))
 
-    for k in range(K):
+    for k in range(cluster):
         pi[k] = data[clu == k].shape[0]
         cov[k] = np.cov(data[clu == k].T)
 
@@ -221,141 +184,80 @@ def ini(data, K):
     return vec, cov, pi
 
 
-# 初期値設定(適当)
-def setInitial(data, K):
+def gauss_all(data, vec, cov):
+    """Calculate all gauss.
+
+    Args:
+        data (ndarray): target data
+        vec (ndarray): vector
+        cov (ndarray): covariance
+
+    Returns:
+        ndarray: _description_
     """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    K:int
-      the number of cluster
-
-    returns
-    ---
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
-
-    """
-    D = data.shape[1]
-    vec = np.random.randn(K, D)
-    cov = np.array([np.eye(D) for i in range(K)])
-    pi = np.array([1 / K for i in range(K)])
-    return vec, cov, pi
-
-
-# データすべての多次元ガウス分布
-def gauss_all(Data, vec, cov):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-
-    return
-    ---
-    Nk:numpy.ndarray
-
-    """
-    num, dim = Data.shape
+    num, dim = data.shape
     inv = np.linalg.inv(cov)
     det = np.linalg.det(cov)
     Nk = np.zeros(num)
 
     for i in range(num):
         a = ((2 * np.pi) ** (0.5 * dim)) * (det ** 0.5)
-        b = -0.5 * (Data[i] - vec)[None, :] @ inv @ (Data[i] - vec)
+        b = -0.5 * (data[i] - vec)[None, :] @ inv @ (data[i] - vec)
         Nk[i] = np.exp(b) / a
 
     return Nk
 
 
-# 混合ガウス分布
-def gmm(Data, Vec, Cov, Pi):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
+def gmm(data, vec, cov, pi):
+    """mixed Gaussian distribution.
 
-    return
-    --
-    N:numpy.ndarray
-    np.sum(N, axis=0)[None,:]:numpy.ndarray
+    Args:
+        data (ndarray): target data
+        vec (ndarray): vector
+        cov (ndarray): covariance
+        pi (ndarray): pi list
 
+    Returns:
+        ndarray: calculated gauss list
     """
-    k = len(Vec)
-    N = np.array([Pi[i] * gauss_all(Data, Vec[i], Cov[i]) for i in range(k)])
+    k = len(vec)
+    N = np.array([pi[i] * gauss_all(data, vec[i], cov[i]) for i in range(k)])
+
     return N, np.sum(N, axis=0)[None, :]
 
 
-# 対数尤度関数
-def log_likelihood(Data, Vec, Cov, Pi):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
+def log_likelihood(data, vec, cov, pi):
+    """Calculate Log-likelihood function.
 
-    return
-    ---
-    np.sum(logs):numpy.ndarray
-                 log likelihood function
+    Args:
+        data (ndarray): target data
+        vec (ndarray): vector
+        cov (ndarray): covariance
+        pi (ndarray): pi list
+
+    Returns:
+        int: sum of log
     """
-    num, _ = Data.shape
-    _, N_sum = gmm(Data, Vec, Cov, Pi)
+    num, dim = data.shape
+    _, N_sum = gmm(data, vec, cov, pi)
     logs = np.array([np.log(N_sum[0][i]) for i in range(num)])
     return np.sum(logs)
 
 
-# EMアルゴリズム
-def Em(data, vec, cov, pi, eps):
-    """
-    paramerters
-    --
-    data:numpy.ndarray
-         csv data
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
-    eps:float
-        threshold
+def EM(data, vec, cov, pi, eps):
+    """Calculate EM Algorithm.
 
-    return
-    ---
-    gamma:numpy.ndarray
-         burden rate
-    vec:numpy.ndarray
-        mean vector
-    cov:numpy.ndarray
-        covariance matrix
-    pi:numpy.ndarray
-       mixing coefficient
+    Args:
+        data (ndarray): target data
+        vec (ndarray): vector
+        cov (ndarray): covariance
+        pi (ndarray): pi list
+        eps (flow): max number
+
+    Returns:
+        ndarray: result of EM Algorithm
     """
-    K = vec.shape[0]
+    cluster = vec.shape[0]
     num, dim = data.shape
     count = 0
     log_list = []
@@ -363,32 +265,23 @@ def Em(data, vec, cov, pi, eps):
     while True:
         old_log = log_likelihood(data, vec, cov, pi)
         N, N_sum = gmm(data, vec, cov, pi)
-        cov = np.zeros((K, dim, dim))
-        # Eステップ
-        # 負担率更新
+        cov = np.zeros((cluster, dim, dim))
         gamma = N / N_sum
-
-        # Mステップ
-
-        # 平均ベクトル更新
         vec = (gamma @ data) / np.sum(gamma, axis=1)[:, None]
 
-        # 分散更新
-        for k in range(K):
+        for k in range(cluster):
             for n in range(num):
                 dis = data[n] - vec[k]
                 cov[k] += gamma[k][n] * dis[:, None] @ dis[None, :]
 
             cov[k] = cov[k] / np.sum(gamma[k])
 
-        # 混合係数
         pi = np.sum(gamma, axis=1) / num
 
         new_log = log_likelihood(data, vec, cov, pi)
         log_dif = old_log - new_log
         log_list = np.append(log_list, log_dif)
 
-        # 収束確認
         if np.abs(log_dif) < eps:
             return count, gamma, vec, cov, pi, log_list
         else:

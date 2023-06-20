@@ -3,6 +3,8 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import gmm
 
 
 def parse_args():
@@ -15,10 +17,10 @@ def parse_args():
         help="data csv file",
     )
     parser.add_argument(
-        "--dimension",
+        "--cluster",
         type=int,
         default=2,
-        help="compress dimension",
+        help="number of cluster",
     )
 
     return parser.parse_args()
@@ -31,9 +33,9 @@ def open_csv(file_path):
     Returns:
         ndarray: Data read
     """
-    data_set = np.loadtxt(fname=file_path, delimiter=",")
-
-    return data_set
+    df = pd.read_csv(file_path)
+    data = df.values
+    return df, data
 
 
 def plot2d(data):
@@ -72,42 +74,27 @@ def plot1d(data):
     plt.close()
 
 
-# 対数尤度関数のプロット
-def logplot(log_list, save):
-    """
-    log_list:list
-            log likelihood function
-    save:str
-         save name
-    """
-    num = str(save)[0]
-
-    fig = plt.figure(figsize=(8, 6))
-    ax = fig.add_subplot(111)
-    ax.plot(log_list)
-    ax.set_xlabel("count", fontsize=18)
-    ax.set_ylabel("log likelihood function", fontsize=18)
-    plt.title("data" + num, fontsize=18)
-    plt.grid()
-    plt.tight_layout()
-    if type(save) == str:
-        logsave = "log" + save
-        plt.savefig(logsave)
-    plt.show()
-
-
 def main():
-    """Calculate PCA."""
+    """Calculate GMM main file.
+    """
     args = parse_args()
+    fname = args.csv_file
+    cluster = args.cluster
 
-    file_path = args.csv_file
-    data = open_csv(file_path)
-    d_dim = data.shape
+    df, data = open_csv(fname)
+    num, dim = data.shape
+    eps = 0.01
+    vec0, cov0, pi0 = gmm.ini(data, cluster)
+    count, gamma, vec, cov, pi, log_list = gmm.EM(data, vec0, cov0, pi0, eps)
 
-    if file_path == "data1.csv":
-        plot1d(data)
-    elif file_path == "data2.csv" or file_path == "data3.csv":
-        plot2d(data)
+    clu = np.argmax(gamma, axis=0)
+    if dim == 1:
+        gmm.scatter_1d(data, clu, vec, cov, pi)
+    elif dim == 2:
+        gmm.scatter_2d(data, clu, vec, cov, pi)
+    else:
+        "error: dimension"
+    gmm.logplot(log_list)
 
 
 if __name__ == "__main__":
