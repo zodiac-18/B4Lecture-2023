@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import multivariate_normal
 
 
-def scatter_1d(data, clu, vec, cov, pi):
+def scatter_1d(data, clu, vec, cov, pi, savename):
     """1D scatter plots.
 
     Args:
@@ -37,7 +37,7 @@ def scatter_1d(data, clu, vec, cov, pi):
 
     ax.set_xlabel("x")
     ax.set_ylabel("gaussian distribution")
-    plt.title("data")
+    plt.title(savename)
     plt.grid()
     plt.legend()
     plt.tight_layout()
@@ -45,7 +45,7 @@ def scatter_1d(data, clu, vec, cov, pi):
     plt.show()
 
 
-def scatter_2d(data, clu, vec, cov, pi):
+def scatter_2d(data, clu, vec, cov, pi, savename):
     """2D scatter plots.
 
     Args:
@@ -88,7 +88,7 @@ def scatter_2d(data, clu, vec, cov, pi):
 
     ax.set_xlabel("x")
     ax.set_ylabel("y")
-    plt.title("data")
+    plt.title(savename)
     plt.grid()
     plt.legend()
     plt.tight_layout()
@@ -96,7 +96,7 @@ def scatter_2d(data, clu, vec, cov, pi):
     plt.show()
 
 
-def logplot(log_list):
+def logplot(log_list, savename):
     """Plot the log-likelihood function.
 
     Args:
@@ -107,10 +107,10 @@ def logplot(log_list):
     ax.plot(log_list)
     ax.set_xlabel("count", fontsize=18)
     ax.set_ylabel("log likelihood function", fontsize=18)
-    plt.title("data", fontsize=18)
+    plt.title(savename, fontsize=18)
     plt.grid()
     plt.tight_layout()
-    plt.savefig("result/log.png")
+    plt.savefig(savename)
     plt.show()
 
 

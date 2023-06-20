@@ -23,6 +23,12 @@ def parse_args():
         default=2,
         help="number of cluster",
     )
+    parser.add_argument(
+        "--save_name",
+        type=str,
+        default="data1",
+        help="name of savefile",
+    )
 
     return parser.parse_args()
 
@@ -80,6 +86,7 @@ def main():
     args = parse_args()
     fname = args.csv_file
     cluster = args.cluster
+    savename = args.save_name
 
     df, data = open_csv(fname)
     num, dim = data.shape
@@ -89,12 +96,12 @@ def main():
 
     clu = np.argmax(gamma, axis=0)
     if dim == 1:
-        gmm.scatter_1d(data, clu, vec, cov, pi)
+        gmm.scatter_1d(data, clu, vec, cov, pi, savename)
     elif dim == 2:
-        gmm.scatter_2d(data, clu, vec, cov, pi)
+        gmm.scatter_2d(data, clu, vec, cov, pi, savename)
     else:
         "error: dimension"
-    gmm.logplot(log_list)
+    gmm.logplot(log_list, savename)
 
 
 if __name__ == "__main__":
