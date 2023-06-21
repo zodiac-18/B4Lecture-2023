@@ -7,7 +7,10 @@ import collections
 import csv
 import os
 from scipy import stats as st
+from matplotlib import cm
 import numpy.random as rd
+from matplotlib.animation import FuncAnimation as animation
+
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -30,6 +33,7 @@ class GMM:
         self.pi = np.concatenate([np.full(K-1, 1/K), [1 - (K-1)*(1/K)]])
         self.cov = np.array([np.cov(data.T) + np.eye(data.shape[1]) for _ in range(K)])
         self.epsilon = epsilon
+        self.likelihood = None
 
     def fit(self, data):
         """
@@ -101,6 +105,8 @@ def main():
     file_name = os.path.splitext(os.path.basename(path))[0]
     
     epsilon = args.epsilon
+    
+    k = args.k
 
     # Read data from the csv file
     data = []
@@ -116,56 +122,140 @@ def main():
     cmap_keyword = "jet"
     cmap = plt.get_cmap(cmap_keyword)
     
-    model = GMM(data, epsilon)
-    b = model.fit(data)
+    model = GMM(data, epsilon, k)
+    log_likelihood = model.fit(data)
     
-    """
-
-    model = KMeans(cluster_n, dim)
-    count_labels = np.zeros(data.shape[0])
-    while not (
-        np.all(count_labels > min_cluster_data_num) and len(count_labels) == cluster_n
-    ):
-        model.fit(data)
-        labels = model.labels
-        count_labels = np.array(list(collections.Counter(labels).values()))
-    scatter_label_list = [f"cluster_{k:0=2}" for k in range(cluster_n)]
-
-    fig = plt.figure(figsize=(15, 10))
-
-    # k-means clustering　for two-dimensional data
-    if dim == 2:
-        ax = fig.add_subplot(111)
-        for i in range(cluster_n):
-            indices = np.where(labels == i)[0]
-            ax.scatter(
-                data[indices, 0],
-                data[indices, 1],
-                color=cmap((i + 1) / cluster_n),
+    # Plot log likelihood
+    fig1 = plt.figure(figsize=(15, 10))
+    ax1 = fig1.add_subplot(111)
+    ax1.plot(log_likelihood, c="red", label="log likelihood")
+    ax1.set_xlabel("Iteration")
+    ax1.set_ylabel("Log likelihood")
+    ax1.set_title(f"Log likelihood of {file_name} (k={k})")
+    ax1.legend()
+    
+    fig1.savefig(f"loglike_{file_name}_k_{k}.png")
+    
+    fig2 = plt.figure(figsize=(15, 10))
+    ax2 = fig2.add_subplot(111)
+    likelihood = model.calc_likelihood(data)
+    cluster_label = np.array([np.argmax(likelihood[n]) for n in range(data.shape[0])])
+    scatter_label_list = np.array([f"cluster_{k:0=2}" for k in range(k)])
+    
+    if dim == 1:
+        x = np.linspace(
+            np.min(data[:, 0]),
+            np.max(data[:, 0]),
+            1000
+            )[:, np.newaxis]
+        pdf = np.sum(model.calc_likelihood(x), axis=1)
+        for i in range(k):
+            indices = np.where(cluster_label == i)[0]
+            ax2.scatter(
+                data[indices],
+                np.zeros(len(indices)),
+                color=cmap((i + 1) / (k + 2)),
                 label=scatter_label_list[i],
             )
-    # k-means clustering　for three-dimensional data
-    elif dim == 3:
-        ax = fig.add_subplot(111, projection="3d")
-        for i in range(cluster_n):
-            indices = np.where(labels == i)[0]
-            ax.scatter3D(
-                data[indices, 0],
-                data[indices, 1],
-                data[indices, 2],
-                color=cmap((i + 1) / cluster_n),
-                label=scatter_label_list[i],
+        ax2.scatter(
+            model.mu[:, 0],
+            np.zeros(model.mu.shape[0]),
+            color="red",
+            label="Centroid",
+            marker="x"
+        )
+        ax2.plot(x, pdf, label="GMM", color="green")
+        ax2.set(
+            xlabel="x",
+            ylabel="Probability density",
+            title = f"Clustered data and pdf of {file_name}(k={k})",
+            xlim=(np.min(data[:, 0]) - 1, np.max(data[:, 0]) + 1),
+        )
+        ax2.grid()
+    
+    else:
+        for i in range(k):
+            indices = np.where(cluster_label == i)[0]
+            ax2.scatter(data[indices, 0],
+                        data[indices, 1],
+                        color=cmap((i + 1) / k),
+                        label=scatter_label_list[i])
+        ax2.scatter(model.mu[:, 0],
+                    model.mu[:, 1],
+                    color="red",
+                    marker="x"
+                    )
+        x1 = np.linspace(np.min(data[:, 0]), np.max(data[:, 0]), 100)
+        x2 = np.linspace(np.min(data[:, 1]), np.max(data[:, 1]), 100)
+        X1, X2 = np.meshgrid(x1, x2)
+        X = np.vstack([X1.flatten(), X2.flatten()])
+        pdf = np.sum(model.calc_likelihood(X.T), axis=1)
+        pdf = pdf.reshape(X1.shape)
+        cset = ax2.contour(X1, X2, pdf, cmap=cmap)
+        ax2.clabel(cset, fmt='%1.2f', fontsize=9)
+        ax2.legend()
+        ax2.set(
+            xlabel="x",
+            ylabel="y",
+            xlim=(np.min(data[:, 0]) - 1, np.max(data[:, 0]) + 1),
+            ylim=(np.min(data[:, 1]) - 1, np.max(data[:, 1]) + 1),
+            title=f"Contour map of {file_name} (K = {k})"
+        )
+        
+        fig3 = plt.figure(figsize=(15, 10))
+        ax3 = fig3.add_subplot(111, projection="3d")
+        def animation_init():
+            for i in range(k):
+                indices = np.where(cluster_label == i)[0]
+                ax3.scatter(data[indices, 0],
+                            data[indices, 1],
+                            np.zeros(len(indices)),
+                            color=cmap((i + 1) / k),
+                            label=scatter_label_list[i])
+            ax3.scatter(
+                model.mu[:, 0],
+                model.mu[:, 1],
+                np.zeros(model.mu.shape[0]),
+                color="red",
+                label="Centroid",
+                marker="x",
+                s=100
             )
-        ax.set_zlabel("$z$")
+            ax3.plot_surface(
+                X1,
+                X2,
+                pdf,
+                label="GMM",
+                rstride=1,
+                cstride=1,
+                cmap=cm.coolwarm,
+                alpha=0.6
+            )
+            return (fig3,)
 
-    ax.set_xlabel("$x$")
-    ax.set_ylabel("$y$")
-    ax.set_title(f"$k$-means clustering of {file_name} ($k={cluster_n}$)")
-    ax.legend(loc="upper left")
-    if args.save_fig:
-        fig.savefig(f"fig/{file_name}_{cluster_n}.png")
+        rotate_azim = np.linspace(60, 420, 120)
+        def animate(i):
+            ax3.view_init(azim=rotate_azim[i], roll=5)
+            return (fig3,)
+        
+        ani = animation(
+            fig3,
+            func=animate,
+            init_func=animation_init,
+            frames=np.arange(60),
+            interval=100,
+            blit=True,
+            repeat=False,
+        )
+        ax3.set(
+            xlabel="x1",
+            ylabel="x2",
+            zlabel="Probability density",
+            title=f"Probability density of {file_name} (K = {k})"
+        )
+        ax3.grid()
+        ani.save(f"result_{file_name}_K{k}_ani.gif", writer="pillow")
     plt.show()
-    """
 
 
 if __name__ == "__main__":
