@@ -201,6 +201,7 @@ def main():
             xlim=(np.min(data[:, 0]) - 1, np.max(data[:, 0]) + 1),
         )
         ax2.grid()
+        fig2.savefig(f"cluster_{file_name}_k_{k}.png")
 
     else:
         # Plot clustered data and a pdf of mixture gaussian distribution by contour lines.
