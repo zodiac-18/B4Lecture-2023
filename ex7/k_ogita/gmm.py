@@ -24,8 +24,9 @@ class GMM:
         Initialize instance variable.
 
         Args:
-            cluster_n (int): The number of cluster.
-            dim (int, optional): Dimension of the data. Defaults to 2.
+            data (ndarray): Input data.
+            epsilon (float): Threshold for terminating fitting.
+            K (int, optional): Number of clusters.
         """
         indices = np.random.choice(range(len(data)), size=K, replace=False)
         self.K = K
@@ -42,17 +43,23 @@ class GMM:
         Args:
             data (ndarray): Input data.
         """
-        log_likelihood = self.calc_loglikelihood(data)
+        log_likelihood = self._calc_loglikelihood(data)
         log_likelihood_list = [log_likelihood]
         while True:
             self._em_step(data)
-            log_likelihood = self.calc_loglikelihood(data)
+            log_likelihood = self._calc_loglikelihood(data)
             log_likelihood_list.append(log_likelihood)
             if np.abs(log_likelihood_list[-1] - log_likelihood_list[-2]) < self.epsilon:
                 break
         return log_likelihood_list
         
     def _em_step(self, data):
+        """
+        Run EM algorithm.
+
+        Args:
+            data (ndarray): Input data.
+        """
         # ============== E step ==============
         likelihood = self.calc_likelihood(data)
         # Calculate (𝜋ₖ * 𝑁(xₙ|𝝁ₖ,𝚺ₖ)) / (∑[𝑗=1 to 𝐾](𝜋ⱼ * 𝑁(xₙ|𝝁ⱼ,𝚺ⱼ)))
@@ -67,25 +74,54 @@ class GMM:
             self.cov[k] = gamma[k] * diff[k].T @ diff[k] / N_k[k]
 
     def _calc_gauss_pdf(self, data, mu, cov):
+        """
+        Calculate the probability density function of a Gaussian distribution.
+
+        Args:
+            data (_type_): _description_
+            mu (_type_): _description_
+            cov (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
         n_features = data.shape[0]
         # Calculate N(xₙ|𝝁ₖ,𝚺ₖ)
         gauss_pdf = 1 / (np.power(np.sqrt(2 * np.pi), n_features) * np.sqrt(np.linalg.det(cov))) * np.exp(-0.5 * (data - mu) @ np.linalg.inv(cov) @ (data - mu).T)
         return gauss_pdf
 
     def calc_likelihood(self, data):
+        """
+        Calculate likelihood.
+
+        Args:
+            data (ndarray): Input data.
+
+        Returns:
+            ndarray: Likelihood.
+        """
         likelihood = np.zeros((data.shape[0], self.K))
         for k in range(self.K):
-            # Calculate 𝜋ₖ * N(xₙ|𝝁ₖ,𝚺ₖ)
+            # Calculate 𝜋ₖ * N(xₙ|𝝁ₖ,𝚺ₖ) (pdf of mixture gaussian distribution)
             likelihood[:, k] = [self.pi[k] * self._calc_gauss_pdf(x, self.mu[k], self.cov[k]) for x in data]
         return likelihood
     
-    def calc_loglikelihood(self, data):
+    def _calc_loglikelihood(self, data):
+        """
+        Calculate loglikelihood.
+
+        Args:
+            data (ndarray): Input data.
+
+        Returns:
+            ndarray: Loglikelihood.
+        """
         likelihood = self.calc_likelihood(data)
         return np.sum(np.log(np.sum(likelihood, axis=1)), axis=0)
 
 
 def main():
-    """Classify the data using k-means method."""
+    """Classify the data using gaussian mixture model."""
     parser = argparse.ArgumentParser()
     parser.add_argument("path", help="the path to the input data")
     parser.add_argument(
@@ -93,9 +129,6 @@ def main():
     )
     parser.add_argument(
         "-e", "--epsilon", help="Epsilon", type=float, default=0.00001
-    )
-    parser.add_argument(
-        "-save", "--save_fig", help="Whether to save figure or not", action="store_true"
     )
     args = parser.parse_args()
 
@@ -143,6 +176,7 @@ def main():
     scatter_label_list = np.array([f"cluster_{k:0=2}" for k in range(k)])
     
     if dim == 1:
+        # Plot clustered data and pdf of mixture gaussian distribution.
         x = np.linspace(
             np.min(data[:, 0]),
             np.max(data[:, 0]),
@@ -174,6 +208,7 @@ def main():
         ax2.grid()
     
     else:
+        # Plot clustered data and a pdf of mixture gaussian distribution by contour lines.
         for i in range(k):
             indices = np.where(cluster_label == i)[0]
             ax2.scatter(data[indices, 0],
@@ -202,6 +237,9 @@ def main():
             title=f"Contour map of {file_name} (K = {k})"
         )
         
+        fig2.savefig(f"cluster_{file_name}_k_{k}.png")
+        
+        # Plot pdf of mixture Gaussian distribution in 3D.
         fig3 = plt.figure(figsize=(15, 10))
         ax3 = fig3.add_subplot(111, projection="3d")
         def animation_init():
@@ -225,7 +263,6 @@ def main():
                 X1,
                 X2,
                 pdf,
-                label="GMM",
                 rstride=1,
                 cstride=1,
                 cmap=cm.coolwarm,
@@ -254,7 +291,7 @@ def main():
             title=f"Probability density of {file_name} (K = {k})"
         )
         ax3.grid()
-        ani.save(f"result_{file_name}_K{k}_ani.gif", writer="pillow")
+        ani.save(f"prob_{file_name}_k_{k}.gif", writer="pillow")
     plt.show()
 
 
