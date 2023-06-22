@@ -90,14 +90,15 @@ def viterbi_algorithm(output, init_dist, trans_prob, out_prob):
     return predict
 
 
-def cm_plot(predict, answer, algorithm):
+def cm_plot(predict, answer, algorithm, runtime):
     """
     Plot predicted results on a heat map.
 
     Args:
         predict (ndarray): Predicted Models.
         answer (ndarray): Correct models with output series generated.
-        algorithm (str): Name of algorithm used.
+        algorithm (str): Name of used algorithm.
+        runtime (float): Runtime of used algorithm.
 
     Returns:
         None
@@ -110,7 +111,7 @@ def cm_plot(predict, answer, algorithm):
     acc = np.sum(predict - answer == 0) / len(answer) * 100
     # plot confusion matrix
     sns.heatmap(cm, annot=True, cbar=False, cmap="Reds")
-    plt.title(algorithm + f"\n(Accuracy : {acc}%)")
+    plt.title(algorithm + f"\nAccuracy: {acc}%\nRumtime: {runtime:.4f} s")
     plt.xlabel("Predicted model")
     plt.ylabel("Actual model")
 
@@ -149,16 +150,15 @@ def main():
     forward_time = forward_stop - forward_start
     viterbi_time = viterbi_stop - viterbi_start
 
+    # display results
     plt.rcParams["font.family"] = "Times New Roman"
     plt.rcParams["font.size"] = 12
-    # display results
-    print(f"Execution time of forward algorithm : {forward_time:.5f} [s]")
-    print(f"Execution time of viterbi algorithm : {viterbi_time:.5f} [s]")
-    plt.figure(figsize=(11, 5))
+    plt.figure(figsize=(11, 6))
     plt.subplot(121)
-    cm_plot(forward_pred, answer_models, "Forward algorithm")
+    cm_plot(forward_pred, answer_models, "Forward algorithm", forward_time)
     plt.subplot(122)
-    cm_plot(viterbi_pred, answer_models, "Viterbi algorithm")
+    cm_plot(viterbi_pred, answer_models, "Viterbi algorithm", viterbi_time)
+    plt.tight_layout()
     plt.show()
 
 
