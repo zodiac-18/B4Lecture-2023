@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 from sklearn.metrics import accuracy_score, confusion_matrix
+import time
 
 
 def forward(output, A, B, PI) -> np.array:
@@ -89,8 +90,14 @@ def main():
     answer_models = np.array(data["answer_models"])
 
     # execute HMM
+    start_time = time.time()
     predicted_models_forward = forward(output, A, B, PI)
+    end_time = time.time()
+    print(f"forward algorithm time: {end_time-start_time}")
+    start_time = time.time()
     predicted_models_viterbi = viterbi(output, A, B, PI)
+    end_time = time.time()
+    print(f"viterbi algorithm time: {end_time-start_time}")
 
     # display results
     plt.rcParams["figure.figsize"] = (13, 6)
