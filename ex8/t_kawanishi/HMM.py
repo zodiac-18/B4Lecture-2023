@@ -8,8 +8,9 @@ import numpy as np
 
 class HMM:
     """This is a class to conduct HMM."""
+
     def __init__(self, path):
-        """initializing.
+        """Initializing.
 
         Args:
             path (_type_): path of pickle data
@@ -40,7 +41,7 @@ class HMM:
         return f_name
 
     def get_info(self):
-        """get pickle information."""
+        """Get pickle information."""
         print()
         print((self.fname + "   " + self.type).center(40, "="))
         print("answer models of each sequence: " + str(self.answer.shape[0]).rjust(4))
@@ -52,7 +53,7 @@ class HMM:
         print()
 
     def load_pickle(self, path: str) -> dict:
-        """load pickle file
+        """Load pickle file.
 
         Args:
             path (str): path to the pickle
@@ -64,7 +65,7 @@ class HMM:
         return data
 
     def Forward(self) -> tuple[np.ndarray, float, float]:
-        """predict HMM by forward
+        """Predict HMM by forward.
 
         Returns:
             np.ndarray: predict
@@ -107,7 +108,7 @@ class HMM:
         return pre, t1 * 1000, t2 * 1000
 
     def Viterbi(self) -> tuple[np.ndarray, float, float]:
-        """predict HMM by viterbi
+        """Predict HMM by viterbi.
 
         Returns:
             np.ndarray: predict
