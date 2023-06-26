@@ -32,14 +32,12 @@ def forward(output, A, B, PI) -> np.array:
         # recursive
         for j in range(1, length_of_output):
             output_oi = output[i, j]
-            alpha = np.sum(alpha[:, :, np.newaxis] * A, axis=1)\
-                * B[:, :, output_oi]
+            alpha = np.sum(alpha[:, :, np.newaxis] * A, axis=1) * B[:, :, output_oi]
         # calculate probabilities for each model
         P = np.sum(alpha, axis=1)
         predict_models[i] = np.argmax(P)
 
     return predict_models
-
 
 def viterbi(output, A, B, PI) -> np.array:
     """
@@ -64,8 +62,7 @@ def viterbi(output, A, B, PI) -> np.array:
         # recursive
         for j in range(1, length_of_output):
             output_oi = output[i, j]
-            alpha = np.max(alpha[:, :, np.newaxis] * A, axis=1)\
-                * B[:, :, output_oi]
+            alpha = np.max(alpha[:, :, np.newaxis] * A, axis=1) * B[:, :, output_oi]
         # calculate probabilities for each model
         P = np.max(alpha, axis=1)
         predict_models[i] = np.argmax(P)
@@ -106,7 +103,7 @@ def main():
     plt.subplot(121)
     acc_forward = 100 * accuracy_score(answer_models, predicted_models_forward)
     cm = confusion_matrix(answer_models, predicted_models_forward)
-    sns.heatmap(cm, annot=True, cmap='Blues')
+    sns.heatmap(cm, annot=True, cmap="Blues")
     plt.xlabel("Predicted model")
     plt.ylabel("Actual model")
     plt.title(f"Forward algorithm\n(Acc. {acc_forward:.0f}%)")
@@ -114,7 +111,7 @@ def main():
     plt.subplot(122)
     acc_viterbi = 100 * accuracy_score(answer_models, predicted_models_viterbi)
     cm = confusion_matrix(answer_models, predicted_models_viterbi)
-    sns.heatmap(cm, annot=True, cmap='Blues')
+    sns.heatmap(cm, annot=True, cmap="Blues")
     plt.xlabel("Predicted model")
     plt.ylabel("Actual model")
     plt.title(f"Viterbi algorithm\n(Acc. {acc_viterbi:.0f}%)")
