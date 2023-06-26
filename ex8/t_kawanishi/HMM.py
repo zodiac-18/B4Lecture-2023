@@ -37,11 +37,9 @@ class HMM:
         """get pickle information."""
         print()
         print((self.fname + "   " + self.type).center(40, "="))
-        print("answer models of each sequence: "
-              + str(self.answer.shape[0]).rjust(4))
+        print("answer models of each sequence: " + str(self.answer.shape[0]).rjust(4))
         print("number of sequences: " + str(self.output.shape[0]).rjust(15))
-        print("length of each sequence: "
-              + str(self.output.shape[1]).rjust(11))
+        print("length of each sequence: " + str(self.output.shape[1]).rjust(11))
         print("Number of models: " + str(self.PI.shape[0]).rjust(18))
         print("Number of states: " + str(self.PI.shape[1]).rjust(18))
         print("Number of output states: " + str(self.B.shape[2]).rjust(11))
@@ -78,8 +76,9 @@ class HMM:
         # loop stage
         for i in range(1, self.output.shape[1]):
             alpha = (
-                np.sum(alpha * self.A[:, :, np.newaxis], axis=1)
-                .transpose(0, 2, 1)[:, :, :, np.newaxis]
+                np.sum(alpha * self.A[:, :, np.newaxis], axis=1).transpose(0, 2, 1)[
+                    :, :, :, np.newaxis
+                ]
                 * self.B[:, :, output[:, i]]
             )
 
@@ -119,8 +118,9 @@ class HMM:
         # loop stage
         for i in range(1, self.output.shape[1]):
             alpha = (
-                np.max(alpha * self.A[:, :, np.newaxis], axis=1)
-                .transpose(0, 2, 1)[:, :, :, np.newaxis]
+                np.max(alpha * self.A[:, :, np.newaxis], axis=1).transpose(0, 2, 1)[
+                    :, :, :, np.newaxis
+                ]
                 * self.B[:, :, output[:, i]]
             )
 

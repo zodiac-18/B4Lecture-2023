@@ -40,9 +40,7 @@ def main():
 
     # plot confusion matrix
     fig = plt.figure(figsize=(16, 9))
-    plt.suptitle(data.fname
-                 + " learning outcome\nData type: "
-                 + data.type, fontsize=20)
+    plt.suptitle(data.fname + " learning outcome\nData type: " + data.type, fontsize=20)
     A = fig.add_subplot(1, 2, 1)
     B = fig.add_subplot(1, 2, 2)
     sns.heatmap(cmF, ax=A, cmap="Purples", annot=True, square=True)
