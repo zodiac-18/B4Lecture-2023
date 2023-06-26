@@ -10,7 +10,7 @@ class HMM:
     """This is a class to conduct HMM."""
 
     def __init__(self, path):
-        """This is a procedure initializing.
+        """Initialize the procedure.
 
         Args:
             path (_type_): path of pickle data
