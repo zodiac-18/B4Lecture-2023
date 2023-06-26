@@ -7,7 +7,13 @@ import numpy as np
 
 
 class HMM:
+    """This is a class to conduct HMM."""
     def __init__(self, path):
+        """initializing.
+
+        Args:
+            path (_type_): path of pickle data
+        """
         self.data = self.load_pickle(path)
         self.fname = self.get_fname(path)
         self.answer = np.array(self.data["answer_models"])
