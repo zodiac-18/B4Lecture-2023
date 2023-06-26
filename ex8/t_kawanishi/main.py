@@ -10,7 +10,7 @@ import HMM
 
 
 def main():
-    """Main function."""
+    """Conduct main function."""
     # create parser
     parser = argparse.ArgumentParser(
         description="This is a program to model prediction by HMM"
