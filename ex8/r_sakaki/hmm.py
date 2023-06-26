@@ -11,7 +11,7 @@ import time
 
 def forward(output, A, B, PI) -> np.array:
     """
-    predict models by forward algorithm
+    Predict models by forward algorithm
 
     Args:
         output (np.array): output sequence
@@ -41,7 +41,7 @@ def forward(output, A, B, PI) -> np.array:
 
 def viterbi(output, A, B, PI) -> np.array:
     """
-    predict models by viterbi algorithm
+    Predict models by viterbi algorithm
 
     Args:
         output (np.array): output sequence
