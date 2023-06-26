@@ -11,7 +11,7 @@ import time
 
 def forward(output, A, B, PI) -> np.array:
     """
-    Predict models by forward algorithm
+    Predict models by forward algorithm.
 
     Args:
         output (np.array): output sequence
@@ -39,9 +39,10 @@ def forward(output, A, B, PI) -> np.array:
 
     return predict_models
 
+
 def viterbi(output, A, B, PI) -> np.array:
     """
-    Predict models by viterbi algorithm
+    Predict models by viterbi algorithm.
 
     Args:
         output (np.array): output sequence
@@ -71,6 +72,9 @@ def viterbi(output, A, B, PI) -> np.array:
 
 
 def main():
+    """
+    Conduct main function.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("path", help="the path to input data")
     args = parser.parse_args()
