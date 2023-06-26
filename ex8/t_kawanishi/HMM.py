@@ -72,7 +72,6 @@ class HMM:
             float: 1 for-loop times
             float: 2 for-loop times
         """
-
         # ===============only used 1 for-loop==============
         start = time.perf_counter()
         output = self.output[:, :, np.newaxis]
