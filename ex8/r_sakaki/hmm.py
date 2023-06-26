@@ -73,7 +73,7 @@ def viterbi(output, A, B, PI) -> np.array:
 
 
 def main():
-    """ Conduct main function. """
+    """Conduct main function."""
     parser = argparse.ArgumentParser()
     parser.add_argument("path", help="the path to input data")
     args = parser.parse_args()
