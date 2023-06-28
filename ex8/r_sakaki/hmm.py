@@ -23,9 +23,8 @@ def forward(output, A, B, PI) -> np.array:
     Returns:
         predicted_models(np.array): predicted models sequence
     """
-    number_of_outputs = output.shape[0]
-    length_of_output = output.shape[1]
-    predict_models = np.zeros(number_of_outputs)
+    number_of_outputs, length_of_output = output.shape
+    predicted_models = np.zeros(number_of_outputs)
     for i in range(number_of_outputs):
         # initialization
         output_o1 = output[i, 0]
@@ -36,9 +35,9 @@ def forward(output, A, B, PI) -> np.array:
             alpha = np.sum(alpha[:, :, np.newaxis] * A, axis=1) * B[:, :, output_oi]
         # calculate probabilities for each model
         P = np.sum(alpha, axis=1)
-        predict_models[i] = np.argmax(P)
+        predicted_models[i] = np.argmax(P)
 
-    return predict_models
+    return predicted_models
 
 
 def viterbi(output, A, B, PI) -> np.array:
@@ -54,9 +53,8 @@ def viterbi(output, A, B, PI) -> np.array:
     Returns:
         predicted_models(np.array): predicted models sequence
     """
-    number_of_outputs = output.shape[0]
-    length_of_output = output.shape[1]
-    predict_models = np.zeros(number_of_outputs)
+    number_of_outputs, length_of_output = output.shape
+    predicted_models = np.zeros(number_of_outputs)
     for i in range(number_of_outputs):
         # initialization
         output_o1 = output[i, 0]
@@ -67,9 +65,9 @@ def viterbi(output, A, B, PI) -> np.array:
             alpha = np.max(alpha[:, :, np.newaxis] * A, axis=1) * B[:, :, output_oi]
         # calculate probabilities for each model
         P = np.max(alpha, axis=1)
-        predict_models[i] = np.argmax(P)
+        predicted_models[i] = np.argmax(P)
 
-    return predict_models
+    return predicted_models
 
 
 def main():
