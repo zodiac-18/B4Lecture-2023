@@ -31,7 +31,7 @@ def load_pickle(path):
 
 
 class HMM:
-    "Hidden Markov Model"
+    """Hidden Markov Model."""
 
     def __init__(self, output, answer_models, init_prob, trans_prob, out_prob):
         """
