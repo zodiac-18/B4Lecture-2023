@@ -85,8 +85,8 @@ class HMM:
         ac_viterbi = accuracy_score(self.answer_models, self.model_viterbi)
         # plot
         fig, ax = plt.subplots(1, 2, figsize=(13, 6))
-        plot_mesh(cm_forward, ax, 0, f"Forward Acc : {ac_forward * 100}%")
-        plot_mesh(cm_viterbi, ax, 1, f"Viterbi Acc : {ac_viterbi * 100}%")
+        plot_mesh(cm_forward, ax, 0, f"Forward {data_name} Acc : {ac_forward * 100}%")
+        plot_mesh(cm_viterbi, ax, 1, f"Viterbi {data_name} Acc : {ac_viterbi * 100}%")
         plt.show()
         fig.savefig(f"{data_name}.png")
 
