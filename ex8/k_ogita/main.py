@@ -108,8 +108,10 @@ class HMM:
         ax.set_title(algo_name + f"\nAccuracy: {acc}%\n(runtime: {runtime:.03f}s)")
         ax.set_xlabel("Predicted model")
         ax.set_ylabel("Actual model")
-        print(f"------------Classification report of {algo_name}------------\n")
-        print(skl.classification_report(answer, predict))
+        return (
+            f"------------Classification report of {algo_name}------------\n\n"
+            + skl.classification_report(answer, predict)
+        )
 
 
 def main():
@@ -139,17 +141,21 @@ def main():
 
     viterbi_runtime = time_viterbi_finish - time_viterbi_start
 
+    report_str = ""
+
     fig = plt.figure(figsize=(15, 8))
     fig.suptitle(f"Confusion matrix of {file_name}")
     ax1 = fig.add_subplot(1, 2, 1)
-    hmm.plot_confusion_matrix(
+    report_str += hmm.plot_confusion_matrix(
         forward_pred, answer_models, forward_runtime, "Forward algorithm", ax1
     )
     ax2 = fig.add_subplot(1, 2, 2)
-    hmm.plot_confusion_matrix(
+    report_str += hmm.plot_confusion_matrix(
         viterbi_pred, answer_models, viterbi_runtime, "Viterbi algorithm", ax2
     )
     fig.savefig(f"con_mat_{file_name}.png")
+    f = open(f"result_{file_name}.txt", "w")
+    f.write(report_str)
     plt.tight_layout()
     plt.show()
 

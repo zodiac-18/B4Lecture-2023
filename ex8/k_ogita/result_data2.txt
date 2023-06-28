@@ -1,0 +1,26 @@
+------------Classification report of Forward algorithm------------
+
+              precision    recall  f1-score   support
+
+           0       0.93      1.00      0.97        14
+           1       0.96      0.96      0.96        26
+           2       1.00      0.95      0.98        22
+           3       1.00      1.00      1.00        21
+           4       1.00      1.00      1.00        17
+
+    accuracy                           0.98       100
+   macro avg       0.98      0.98      0.98       100
+weighted avg       0.98      0.98      0.98       100
+------------Classification report of Viterbi algorithm------------
+
+              precision    recall  f1-score   support
+
+           0       0.28      1.00      0.44        14
+           1       1.00      0.38      0.56        26
+           2       1.00      0.14      0.24        22
+           3       1.00      0.43      0.60        21
+           4       0.61      1.00      0.76        17
+
+    accuracy                           0.53       100
+   macro avg       0.78      0.59      0.52       100
+weighted avg       0.83      0.53      0.51       100
