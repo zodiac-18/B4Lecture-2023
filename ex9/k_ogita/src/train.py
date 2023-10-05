@@ -22,15 +22,18 @@ Trainer
 
 import argparse
 import os
+import sys
 
 from matplotlib import pyplot as plt
 import numpy as np
+np.set_printoptions(threshold=np.inf)
 import pandas as pd
 import pytorch_lightning as pl
 import seaborn as sns
 import torch
 import torch.nn as nn
 import torchaudio
+from torchinfo import summary
 import librosa
 import torchaudio.transforms as T
 import torch.nn.functional as F
@@ -63,7 +66,7 @@ def delta(mfcc, l=2):
         delta_mfcc = delta_mfcc / k_square
         return torch.from_numpy(delta_mfcc.astype(np.float32)).clone()
 
-a = 0
+a = 10000
 
 def plot_melspectrogram(spec, title=None, ylabel="freq_bin", aspect="auto", xmax=None):
     global a
@@ -126,18 +129,48 @@ class VITSPosteriorEncoder(pl.LightningModule):
         # reparameterization trick(z=μ+εσ)によりzを擬似サンプリング(マスクを適用)
         z = (m + torch.randn_like(m) * torch.exp(logs)) * x_spec_mask
         return m, logs, z, x_spec_mask
+    
+class CNN(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(CNN, self).__init__()
+        #TODO: hard coding
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.bn2 = nn.BatchNorm2d(64)
+        self.bn3 = nn.BatchNorm2d(128)
+        self.fc1 = nn.Linear(128 * 10 * 6, 256)
+        self.fc2 = nn.Linear(256, output_dim)
+        self.dropout = nn.Dropout(0.2)
+        self.softmax = nn.Softmax(dim=-1)
+        
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = self.pool(self.bn1(x))
+        x = F.relu(self.conv2(x))
+        x = self.pool(self.bn2(x))
+        x = F.relu(self.conv3(x))
+        x = self.pool(self.bn3(x))
+        x = x.view(x.size()[0], -1)
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = self.fc2(x)
+        return x
 
 class train(pl.LightningModule):
     def __init__(self, input_dim, output_dim):
             super().__init__()
-            self.model = self.create_model(input_dim, output_dim)
+            self.model = CNN(input_dim, output_dim)
+            print(self.model)
             self.loss_fn = torch.nn.CrossEntropyLoss()
             self.train_acc = torchmetrics.Accuracy()
             self.val_acc = torchmetrics.Accuracy()
             self.test_acc = torchmetrics.Accuracy()
             self.confm = torchmetrics.ConfusionMatrix(10, normalize='true')
             
-    def create_model(self, input_dim, output_dim):
+    def create_model(self, input_dim, output_dim, model_n="cnn"):
         """
         MLPモデルの構築
         Args:
@@ -162,7 +195,7 @@ class train(pl.LightningModule):
         return model
     
     def forward(self, x):
-        return self.model(x)
+        return self.model(x.unsqueeze(1))
 
     def training_step(self, batch, batch_idx, dataloader_id=None):
         x, y = batch
@@ -214,8 +247,9 @@ class FSDD(Dataset):
         n_mels=80,
         fmin=0,
         fmax=None,
-        aug=True,
-        aug_list=[True, True, True, True],
+        aug=False,
+        aug_list=[False, False, False, False],
+        mixup=True,
         power=2,
         ) -> None:
             super().__init__()
@@ -231,6 +265,7 @@ class FSDD(Dataset):
             self.power = power
             self.aug = aug
             self.aug_list = aug_list
+            self.mixup = mixup
             self.features = self.feature_extraction(path_list)
 
     def feature_extraction(self, path_list):
@@ -276,40 +311,39 @@ class FSDD(Dataset):
                 data = F.pad(data, (0, max_length - data.size(1)))
                 mel_s = mel_transform(data[0]) # [D, T]
                 features[i, :, :] = mel_s
-                #if i % 500 == 0:
-                #    plot_melspectrogram(mel_s)
                 if self.aug:
-                    aug_f, aug_l = self.data_augmentation(mel_s, i, self.aug_list)
-                    aug_features[i:i+aug_num, :, :] = aug_f
-                    aug_label[i:i+aug_num] = aug_l
+                    aug_f, aug_l = self.spec_augment(mel_s, i, self.aug_list)
+                    aug_features[i*aug_num:i*aug_num+aug_num, :, :] = aug_f
+                    aug_label[i*aug_num:i*aug_num+aug_num] = aug_l
             else:
                 mfcc = transform(data[0])
                 delta_mfcc = delta(mfcc)
                 mfcc_mean = torch.mean(mfcc, axis=1)
                 delta_mfcc_mean = torch.mean(delta_mfcc, axis=1)
                 features[i] = torch.cat([mfcc_mean, delta_mfcc_mean])
-        print(f"aaaa{features.size()}")
-        print(aug_features.size())
         features = torch.cat((features, aug_features))
         self.label = np.concatenate((self.label, aug_label)).astype(np.int64)
         return features
     
-    def data_augmentation(self, feature, idx, aug=[True, False, False, False]):
+    def spec_augment(self, feature, idx, aug=[True, False, False, False]):
         aug_features, aug_label = torch.zeros(aug.count(True), self.n_mels, 50), torch.tensor([self.label[idx]] * aug.count(True))
+        #plot_melspectrogram(feature, title="Original Melspectrogram")
         feature = feature.unsqueeze(0)
         idx = 0
         # Time Masking
         if aug[0]:
             masking = T.TimeMasking(time_mask_param=20)
             time_masked_feature = masking(feature)
-            time_masked_feature.squeeze(0)
+            time_masked_feature = time_masked_feature.squeeze(0)
+            #plot_melspectrogram(time_masked_feature, title="Time Masked Melspectrogram")
             aug_features[idx] = time_masked_feature
             idx += 1
         # Frequency Masking
         if aug[1]:
             masking = T.FrequencyMasking(freq_mask_param=15)
             freq_masked_feature = masking(feature)
-            freq_masked_feature.squeeze(0)
+            freq_masked_feature = freq_masked_feature.squeeze(0)
+            #plot_melspectrogram(freq_masked_feature, title="Freq Masked Melspectrogram")
             aug_features[idx] = freq_masked_feature
             idx += 1
         # Time Stretch
@@ -318,7 +352,6 @@ class FSDD(Dataset):
             # 伸縮率は75% ~ 125%の間でランダム
             rate = np.random.choice(np.arange(75,125))/100
             time_stretched_feature = masking(feature, rate)
-            time_stretched_feature.squeeze(0)
             # なぜか複素数が返ってくるので実数に直す
             if time_stretched_feature.dtype == torch.complex64:
                 time_stretched_feature = torch.abs(time_stretched_feature)
@@ -328,6 +361,8 @@ class FSDD(Dataset):
                 time_stretched_feature = torch.cat((time_stretched_feature, padding.unsqueeze(0)), dim=2)
             elif time_stretched_feature.size(2) > 50:
                 time_stretched_feature = time_stretched_feature[:, :, :50]
+            time_stretched_feature = time_stretched_feature.squeeze(0)
+            #plot_melspectrogram(time_stretched_feature, title="Time Stretched Melspectrogram")
             aug_features[idx] = time_stretched_feature
             idx += 1
         if aug[3]:
@@ -338,7 +373,6 @@ class FSDD(Dataset):
                 rate = np.random.choice(np.arange(75,125))/100
                 time_stretch = T.TimeStretch(n_freq=self.n_mels)
                 masked_feature = time_stretch(feature, rate)
-                masked_feature.squeeze(0)
                 # なぜか複素数が返ってくるので実数に直す
                 if masked_feature.dtype == torch.complex64:
                     masked_feature = torch.abs(masked_feature)
@@ -350,6 +384,8 @@ class FSDD(Dataset):
                     masked_feature = masked_feature[:, :, :50]
             freq_masking = T.FrequencyMasking(freq_mask_param=15)
             masked_feature = freq_masking(masked_feature)
+            masked_feature = masked_feature.squeeze(0)
+            #plot_melspectrogram(masked_feature, title="All Masked Melspectrogram")
             aug_features[idx] = masked_feature
         return aug_features, aug_label
     
@@ -421,7 +457,7 @@ def main():
     model = train(input_dim=train_dataset[0][0].shape[0], output_dim=10)
     
     # 学習の設定
-    trainer = pl.Trainer(max_epochs=500, gpus=1)
+    trainer = pl.Trainer(max_epochs=100, gpus=1)
     
     # モデルの学習
     trainer.fit(model=model, datamodule=datamodule)
