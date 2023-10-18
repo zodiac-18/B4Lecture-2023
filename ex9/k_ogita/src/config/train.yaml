@@ -32,12 +32,12 @@ train:
   fmax: null
 
   # data augmentation settings
-  aug: False
-  aug_list: [False, False, False, False]
+  aug: True
+  aug_list: [True, True, True, True]
   time_mask_param: 20
   freq_mask_param: 15
   power: 2
 
 path_to_training: "training.csv"
-path_to_truth: "te.csv"
+path_to_truth: "test_truth.csv"
 out_dir: exp    # directory to output training results.

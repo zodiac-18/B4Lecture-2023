@@ -247,7 +247,7 @@ class FSDD(Dataset):
                 features[i, :, :] = mel_s
                 # Apply spec augmentation
                 if self.aug:
-                    aug_f, aug_l = self.spec_augment(mel_s, i, self.aug_list)
+                    aug_f, aug_l = self.spec_augment(mel_s, i)
                     aug_features[i*aug_num:i*aug_num+aug_num, :, :] = aug_f
                     aug_label[i*aug_num:i*aug_num+aug_num] = aug_l
             elif self.feature == "mfcc":
@@ -293,25 +293,25 @@ class FSDD(Dataset):
             tensor: Data obtained from data augmentation.
         """
         # Make lists for data augmentation
-        aug_features, aug_label = torch.zeros(self.aug.count(True), self.n_mels, self.frame_lengths), torch.tensor([self.label[idx]] * self.aug.count(True))
+        aug_features, aug_label = torch.zeros(self.aug_list.count(True), self.n_mels, self.frame_lengths), torch.tensor([self.label[idx]] * self.aug_list.count(True))
         feature = feature.unsqueeze(0)
         idx = 0
         # Time masking
-        if self.aug[0]:
+        if self.aug_list[0]:
             masking = T.TimeMasking(time_mask_param=self.time_mask_param)
             time_masked_feature = masking(feature)
             time_masked_feature = time_masked_feature.squeeze(0)
             aug_features[idx] = time_masked_feature
             idx += 1
         # Frequency masking
-        if self.aug[1]:
+        if self.aug_list[1]:
             masking = T.FrequencyMasking(freq_mask_param=self.freq_mask_param)
             freq_masked_feature = masking(feature)
             freq_masked_feature = freq_masked_feature.squeeze(0)
             aug_features[idx] = freq_masked_feature
             idx += 1
         # Time stretch
-        if self.aug[2]:
+        if self.aug_list[2]:
             masking = T.TimeStretch(n_freq=self.n_mels)
             # 伸縮率は75% ~ 125%の間でランダム
             rate = np.random.choice(np.arange(75,125))/100
@@ -329,7 +329,7 @@ class FSDD(Dataset):
             aug_features[idx] = time_stretched_feature
             idx += 1
         # (Time masking or time stretch) & freq masking
-        if self.aug[3]:
+        if self.aug_list[3]:
             if np.random.choice((True,False)):
                 time_masking = T.TimeMasking(time_mask_param=self.time_mask_param)
                 masked_feature = time_masking(feature)
@@ -455,6 +455,7 @@ def main(config: DictConfig):
     model = train(input_dim=input_dim, output_dim=10, feature=config.train.feature, model=config.train.model, lr=config.train.lr, frame_lengths=config.train.frame_lengths)
     
     # 学習の設定
+    # trainer = pl.Trainer(max_epochs=config.train.max_epochs)
     trainer = pl.Trainer(max_epochs=config.train.max_epochs, gpus=1)
     
     # モデルの学習
