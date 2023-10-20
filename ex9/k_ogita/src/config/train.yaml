@@ -16,11 +16,11 @@ train:
   # stft settings
   fft_size: 512
   hop_size: 128
-  win_length: 512
+  win_length: null
   window: "hann"
   pad_mode: "reflect"
 
-  model: "CNN"
+  model: "MLP"
   feature: "melspc"
   # mfcc settings
   n_mfcc: 20
@@ -33,7 +33,7 @@ train:
 
   # data augmentation settings
   aug: True
-  aug_list: [True, True, True, True]
+  aug_list: [False, False, False, False]
   time_mask_param: 20
   freq_mask_param: 15
   power: 2
