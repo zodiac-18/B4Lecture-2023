@@ -40,7 +40,6 @@ logger = getLogger(__name__)
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/../"
 
-
 class CNN(nn.Module):
     """CNN model."""
 
@@ -139,16 +138,17 @@ class train(pl.LightningModule):
         )
         return loss
 
-    def validation_step(self, batch):
+    def validation_step(self, batch, batch_idx, dataloader_id=None):
         x, y = batch
         pred = self.forward(x)
         loss = self.loss_fn(pred, y)
         self.log("val/acc", self.val_acc(pred, y), prog_bar=True, logger=True)
         return loss
 
-    def test_step(self, batch):
+    def test_step(self, batch, batch_idx, dataloader_id=None):
         x, y = batch
         pred = self.forward(x)
+        loss = self.loss_fn(pred, y)
         self.log("test/acc", self.test_acc(pred, y), prog_bar=True, logger=True)
         return {"pred": torch.argmax(pred, dim=-1), "target": y}
 
@@ -282,7 +282,7 @@ class FSDD(Dataset):
                 mfcc_mean = torch.mean(mfcc, axis=1)
                 delta_mfcc_mean = torch.mean(delta_mfcc, axis=1)
                 features[i] = torch.cat([mfcc_mean, delta_mfcc_mean])
-        if self.feature == "melspc":
+        if self.feature == "melspc" and self.aug:
             features = torch.cat((features, aug_features))
             self.label = np.concatenate((self.label, aug_label)).astype(np.int64)
         return features
@@ -347,7 +347,6 @@ class FSDD(Dataset):
             # なぜか複素数が返ってくるので実数に直す
             if time_stretched_feature.dtype == torch.complex64:
                 time_stretched_feature = torch.abs(time_stretched_feature)
-            # MLPの場合時系列データは扱えないので系列長を固定
             if time_stretched_feature.size(2) < self.frame_lengths:
                 padding = torch.zeros(
                     self.n_mels, self.frame_lengths - time_stretched_feature.size(2)
@@ -356,7 +355,7 @@ class FSDD(Dataset):
                     (time_stretched_feature, padding.unsqueeze(0)), dim=2
                 )
             elif time_stretched_feature.size(2) > self.frame_lengths:
-                time_stretched_feature = time_stretched_feature[:, :, :50]
+                time_stretched_feature = time_stretched_feature[:, :, :self.frame_lengths]
             time_stretched_feature = time_stretched_feature.squeeze(0)
             aug_features[idx] = time_stretched_feature
             idx += 1
@@ -372,7 +371,6 @@ class FSDD(Dataset):
                 # なぜか複素数が返ってくるので実数に直す
                 if masked_feature.dtype == torch.complex64:
                     masked_feature = torch.abs(masked_feature)
-                # MLPの場合時系列データは扱えないので系列長を固定
                 if masked_feature.size(2) < self.frame_lengths:
                     padding = torch.zeros(
                         self.n_mels, self.frame_lengths - masked_feature.size(2)
