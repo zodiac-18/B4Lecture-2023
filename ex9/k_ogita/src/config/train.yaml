@@ -1,0 +1,43 @@
+# @package _global_
+
+hydra:
+  run:
+    dir: ./
+  output_subdir: null
+
+train:
+  sample_rate: 8000
+  # training settings
+  batch_size: 32
+  num_workers: 4
+  lr: 0.002
+  max_epochs: 100
+
+  # stft settings
+  fft_size: 512
+  hop_size: 128
+  win_length: null
+  window: "hann"
+  pad_mode: "reflect"
+
+  model: "MLP"
+  feature: "melspc"
+  # mfcc settings
+  n_mfcc: 20
+
+  # mel-spectrogram settings
+  frame_lengths: 50
+  n_mels: 80
+  fmin: 0
+  fmax: null
+
+  # data augmentation settings
+  aug: True
+  aug_list: [False, False, False, False]
+  time_mask_param: 20
+  freq_mask_param: 15
+  power: 2
+
+path_to_training: "training.csv"
+path_to_truth: "test_truth.csv"
+out_dir: exp    # directory to output training results.
