@@ -20,7 +20,7 @@ train:
   window: "hann"
   pad_mode: "reflect"
 
-  model: "MLP"
+  model: "CNN"
   feature: "melspc"
   # mfcc settings
   n_mfcc: 20
@@ -32,7 +32,7 @@ train:
   fmax: null
 
   # data augmentation settings
-  aug: True
+  aug: False
   aug_list: [False, False, False, False]
   time_mask_param: 20
   freq_mask_param: 15
